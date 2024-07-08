@@ -16,6 +16,9 @@ const Products = connection_1.default.define('Products', {
     category: {
         type: sequelize_1.DataTypes.STRING
     },
+    brand: {
+        type: sequelize_1.DataTypes.STRING
+    },
     price: {
         type: sequelize_1.DataTypes.FLOAT
     },

@@ -15,6 +15,9 @@ const Users = db.define('Users', {
     },
     username: {
         type: DataTypes.STRING
+    },
+    priceList: {
+        type: DataTypes.INTEGER
     }
 })
 

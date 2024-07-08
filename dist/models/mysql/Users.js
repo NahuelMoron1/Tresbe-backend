@@ -19,6 +19,9 @@ const Users = connection_1.default.define('Users', {
     },
     username: {
         type: sequelize_1.DataTypes.STRING
+    },
+    priceList: {
+        type: sequelize_1.DataTypes.INTEGER
     }
 });
 exports.default = Users;

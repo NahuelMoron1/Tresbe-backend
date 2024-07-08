@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Products from "../models/mysql/Products";
+import { Op, QueryTypes } from "sequelize";
 
 export const getProducts = async (req: Request, res: Response) => {    
     const listProducts = await Products.findAll();
@@ -15,6 +16,54 @@ export const getProduct = async (req: Request, res: Response) => {
         res.status(404).json({message: 'Error, Product not found'})
     }
 }
+export const getProductsByBrands = async (req: Request, res: Response) => {
+    const { brand } = req.params;
+    
+    const productsAux = await Products.findAll({where: {brand: brand}});
+    if(productsAux){
+        res.json(productsAux);
+    } else {
+        res.status(404).json({message: 'Error, product not found'})
+    }
+}
+
+export const getRandomProducts = async (req: Request, res: Response) => {
+    const products = await Products.sequelize?.query(
+      `SELECT * FROM Products ORDER BY RAND() LIMIT 3`,
+      {
+        type: QueryTypes.SELECT
+      }
+    );
+
+    if(products){
+        res.json(products);
+    } else {
+        res.status(404).json({message: 'Error, product not found'})
+    }
+  };
+
+export const getProductsByCategory = async (req: Request, res: Response) => {
+    const { category } = req.params;
+    
+    const productsAux = await Products.findAll({where: {category: category}});
+    if(productsAux){
+        res.json(productsAux);
+    } else {
+        res.status(404).json({message: 'Error, product not found'})
+    }
+}
+
+export const getProductsBySearch = async (req: Request, res: Response) => {
+    const { name } = req.params;
+    
+    const productsAux = await Products.findAll({where: {name: {[Op.like]: `%${name}%`}}});
+    if(productsAux){
+        res.json(productsAux);
+    } else {
+        res.status(404).json({message: 'Error, product not found'})
+    }
+}
+
 export const deleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     const productAux = await Products.findByPk(`${id}`);

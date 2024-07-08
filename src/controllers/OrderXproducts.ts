@@ -15,6 +15,19 @@ export const getOrderXproducts = async (req: Request, res: Response) => {
         res.status(404).json({message: 'Error, OrderXproducts not found'})
     }
 }
+export const getOxpByOrders = async (req: Request, res: Response) => {
+    const { orderid } = req.params;
+    
+    const ordersAux = await OrderXproducts.findAll({where: {orderId: orderid}});  
+    console.log(ordersAux.length);
+    
+      
+    if(ordersAux){
+        res.json(ordersAux);
+    } else {
+        res.status(404).json({message: 'Error, orders not found'})
+    }
+}
 export const deleteOrderXproducts = async (req: Request, res: Response) => {
     const { id } = req.params;
     const OrderAux = await OrderXproducts.findByPk(`${id}`);

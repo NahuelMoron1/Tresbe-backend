@@ -21,7 +21,13 @@ const Order = db.define('Orders', {
     total: {
         type: DataTypes.FLOAT,
     },
+    orderDate: {
+        type: DataTypes.DATE,
+    },
     userID: {
+        type: DataTypes.STRING,
+    },
+    userdataId: {
         type: DataTypes.STRING,
     }
 });

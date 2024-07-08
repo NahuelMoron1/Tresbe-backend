@@ -1,5 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+/*import multer from 'multer'
+import sharp from 'sharp';*/
 import productRouter from '../routes/Products';
 import featuresRouter from '../routes/Features';
 import categoriesRouter from '../routes/Categories';
@@ -7,10 +9,18 @@ import usersRouter from '../routes/Users';
 import ordersRouter from '../routes/Order';
 import ordersXproductsRouter from '../routes/OrderXproducts';
 import userdataRouter from '../routes/Userdata';
+import voucherRouter from '../routes/Voucher'
 import db from '../db/connection';
+import tablePriceRouter from '../routes/PriceXproducts';
+import brandRouter from '../routes/Brands';
 class Server {
     private app: Application;
     private port: string;
+    /*private storage = multer.diskStorage({
+        destination:(req, file, cb) => {
+            cb(null, './uploads')
+        }
+    })*/
     constructor() {
         this.app = express();
         this.port = process.env.PORT || '3001';
@@ -35,7 +45,9 @@ class Server {
         this.app.use('/api/Orders', ordersRouter);
         this.app.use('/api/OrdersXproducts', ordersXproductsRouter);
         this.app.use('/api/userdata', userdataRouter);
-
+        this.app.use('/api/Voucher', voucherRouter);
+        this.app.use('/api/tablePrice', tablePriceRouter);
+        this.app.use('/api/brands', brandRouter);
     }
     middlewares() {
         this.app.use(express.json());

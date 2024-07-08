@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProducts = exports.updateProduct = exports.postProduct = exports.deleteProduct = exports.getProduct = exports.getProducts = void 0;
+exports.deleteProducts = exports.updateProduct = exports.postProduct = exports.deleteProduct = exports.getProductsBySearch = exports.getProductsByCategory = exports.getRandomProducts = exports.getProductsByBrands = exports.getProduct = exports.getProducts = void 0;
 const Products_1 = __importDefault(require("../models/mysql/Products"));
+const sequelize_1 = require("sequelize");
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listProducts = yield Products_1.default.findAll();
     res.json(listProducts);
@@ -30,6 +31,52 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.getProduct = getProduct;
+const getProductsByBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { brand } = req.params;
+    const productsAux = yield Products_1.default.findAll({ where: { brand: brand } });
+    if (productsAux) {
+        res.json(productsAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, product not found' });
+    }
+});
+exports.getProductsByBrands = getProductsByBrands;
+const getRandomProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const products = yield ((_a = Products_1.default.sequelize) === null || _a === void 0 ? void 0 : _a.query(`SELECT * FROM Products ORDER BY RAND() LIMIT 3`, {
+        type: sequelize_1.QueryTypes.SELECT
+    }));
+    if (products) {
+        res.json(products);
+    }
+    else {
+        res.status(404).json({ message: 'Error, product not found' });
+    }
+});
+exports.getRandomProducts = getRandomProducts;
+const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { category } = req.params;
+    const productsAux = yield Products_1.default.findAll({ where: { category: category } });
+    if (productsAux) {
+        res.json(productsAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, product not found' });
+    }
+});
+exports.getProductsByCategory = getProductsByCategory;
+const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name } = req.params;
+    const productsAux = yield Products_1.default.findAll({ where: { name: { [sequelize_1.Op.like]: `%${name}%` } } });
+    if (productsAux) {
+        res.json(productsAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, product not found' });
+    }
+});
+exports.getProductsBySearch = getProductsBySearch;
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const productAux = yield Products_1.default.findByPk(`${id}`);

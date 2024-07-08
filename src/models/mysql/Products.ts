@@ -12,6 +12,9 @@ const Products = db.define('Products', {
     category: {
         type: DataTypes.STRING
     },
+    brand: {
+        type: DataTypes.STRING
+    },
     price: {
         type: DataTypes.FLOAT
     },

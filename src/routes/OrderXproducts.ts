@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { deleteOrderXproducts, deleteOrdersXproducts, getOrderXproducts, getOrdersXproducts, postOrderXproducts, updateOrderXproducts } from "../controllers/OrderXproducts";
+import { deleteOrderXproducts, deleteOrdersXproducts, getOrderXproducts, getOrdersXproducts, getOxpByOrders, postOrderXproducts, updateOrderXproducts } from "../controllers/OrderXproducts";
 const router = Router();
 
 router.get('/', getOrdersXproducts);
+router.get('/orders/:orderid', getOxpByOrders);
 router.get('/:id', getOrderXproducts);
 router.delete('/:id', deleteOrderXproducts);
 router.delete('/:', deleteOrdersXproducts);
