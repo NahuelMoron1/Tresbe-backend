@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+/*import multer from 'multer'
+import sharp from 'sharp';*/
 const Products_1 = __importDefault(require("../routes/Products"));
 const Features_1 = __importDefault(require("../routes/Features"));
 const Categories_1 = __importDefault(require("../routes/Categories"));
@@ -21,8 +23,16 @@ const Users_1 = __importDefault(require("../routes/Users"));
 const Order_1 = __importDefault(require("../routes/Order"));
 const OrderXproducts_1 = __importDefault(require("../routes/OrderXproducts"));
 const Userdata_1 = __importDefault(require("../routes/Userdata"));
+const Voucher_1 = __importDefault(require("../routes/Voucher"));
 const connection_1 = __importDefault(require("../db/connection"));
+const PriceXproducts_1 = __importDefault(require("../routes/PriceXproducts"));
+const Brands_1 = __importDefault(require("../routes/Brands"));
 class Server {
+    /*private storage = multer.diskStorage({
+        destination:(req, file, cb) => {
+            cb(null, './uploads')
+        }
+    })*/
     constructor() {
         this.app = (0, express_1.default)();
         this.port = process.env.PORT || '3001';
@@ -47,6 +57,9 @@ class Server {
         this.app.use('/api/Orders', Order_1.default);
         this.app.use('/api/OrdersXproducts', OrderXproducts_1.default);
         this.app.use('/api/userdata', Userdata_1.default);
+        this.app.use('/api/Voucher', Voucher_1.default);
+        this.app.use('/api/tablePrice', PriceXproducts_1.default);
+        this.app.use('/api/brands', Brands_1.default);
     }
     middlewares() {
         this.app.use(express_1.default.json());

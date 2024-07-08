@@ -25,7 +25,13 @@ const Order = connection_1.default.define('Orders', {
     total: {
         type: sequelize_1.DataTypes.FLOAT,
     },
+    orderDate: {
+        type: sequelize_1.DataTypes.DATE,
+    },
     userID: {
+        type: sequelize_1.DataTypes.STRING,
+    },
+    userdataId: {
         type: sequelize_1.DataTypes.STRING,
     }
 });

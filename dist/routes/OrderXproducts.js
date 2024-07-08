@@ -4,6 +4,7 @@ const express_1 = require("express");
 const OrderXproducts_1 = require("../controllers/OrderXproducts");
 const router = (0, express_1.Router)();
 router.get('/', OrderXproducts_1.getOrdersXproducts);
+router.get('/orders/:orderid', OrderXproducts_1.getOxpByOrders);
 router.get('/:id', OrderXproducts_1.getOrderXproducts);
 router.delete('/:id', OrderXproducts_1.deleteOrderXproducts);
 router.delete('/:', OrderXproducts_1.deleteOrdersXproducts);

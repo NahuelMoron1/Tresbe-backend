@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOrdersXproducts = exports.updateOrderXproducts = exports.postOrderXproducts = exports.deleteOrderXproducts = exports.getOrderXproducts = exports.getOrdersXproducts = void 0;
+exports.deleteOrdersXproducts = exports.updateOrderXproducts = exports.postOrderXproducts = exports.deleteOrderXproducts = exports.getOxpByOrders = exports.getOrderXproducts = exports.getOrdersXproducts = void 0;
 const orderXproducts_1 = require("../models/mysql/orderXproducts");
 const getOrdersXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listOrders = yield orderXproducts_1.OrderXproducts.findAll();
@@ -27,6 +27,18 @@ const getOrderXproducts = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getOrderXproducts = getOrderXproducts;
+const getOxpByOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { orderid } = req.params;
+    const ordersAux = yield orderXproducts_1.OrderXproducts.findAll({ where: { orderId: orderid } });
+    console.log(ordersAux.length);
+    if (ordersAux) {
+        res.json(ordersAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, orders not found' });
+    }
+});
+exports.getOxpByOrders = getOxpByOrders;
 const deleteOrderXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const OrderAux = yield orderXproducts_1.OrderXproducts.findByPk(`${id}`);
