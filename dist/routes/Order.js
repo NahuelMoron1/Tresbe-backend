@@ -4,6 +4,7 @@ const express_1 = require("express");
 const Order_1 = require("../controllers/Order");
 const router = (0, express_1.Router)();
 router.get('/', Order_1.getOrders);
+router.get('/user/debt/:userid', Order_1.getOrdersNotPayed);
 router.get('/user/:userid', Order_1.getOrdersByUser);
 router.get('/:id', Order_1.getOrder);
 router.delete('/:id', Order_1.deleteOrder);

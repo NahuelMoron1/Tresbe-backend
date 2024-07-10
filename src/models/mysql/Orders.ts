@@ -29,6 +29,9 @@ const Order = db.define('Orders', {
     },
     userdataId: {
         type: DataTypes.STRING,
+    },
+    payed: {
+        type: DataTypes.BOOLEAN,
     }
 });
 

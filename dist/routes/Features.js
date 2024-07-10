@@ -5,6 +5,7 @@ const Features_1 = require("../controllers/Features");
 const router = (0, express_1.Router)();
 router.get('/', Features_1.getFeatures);
 router.get('/:id', Features_1.getFeature);
+router.get('/product/:productID', Features_1.getProductFeatures);
 router.delete('/:id', Features_1.deleteFeature);
 router.delete('/:', Features_1.deleteFeatures);
 router.post('/', Features_1.postFeature);

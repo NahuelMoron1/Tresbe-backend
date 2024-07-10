@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteFeatures = exports.updateFeature = exports.postFeature = exports.deleteFeature = exports.getFeature = exports.getFeatures = void 0;
+exports.deleteFeatures = exports.updateFeature = exports.postFeature = exports.deleteFeature = exports.getProductFeatures = exports.getFeature = exports.getFeatures = void 0;
 const Features_1 = __importDefault(require("../models/mysql/Features"));
 const getFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listFeatures = yield Features_1.default.findAll();
@@ -30,6 +30,17 @@ const getFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.getFeature = getFeature;
+const getProductFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { productID } = req.params;
+    const FeatureAux = yield Features_1.default.findAll({ where: { product_id: productID } });
+    if (FeatureAux) {
+        res.json(FeatureAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, Features not found' });
+    }
+});
+exports.getProductFeatures = getProductFeatures;
 const deleteFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const FeatureAux = yield Features_1.default.findByPk(`${id}`);

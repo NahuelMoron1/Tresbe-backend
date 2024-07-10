@@ -26,6 +26,16 @@ export const getOrdersByUser = async (req: Request, res: Response) => {
     }
 }
 
+export const getOrdersNotPayed = async (req: Request, res: Response) => {    
+    const { userid } = req.params;
+    const ordersAux = await Order.findAll({where: {userId: userid} && {payed: false}});
+    if(ordersAux){
+        res.json(ordersAux);
+    } else {
+        res.status(404).json({message: 'Error, orders not found'})
+    }
+}
+
 export const getOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
     const OrderAux = await Order.findByPk(id);    

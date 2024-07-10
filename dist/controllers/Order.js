@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.deleteOrder = exports.getOrder = exports.getOrdersByUser = exports.getOrders = void 0;
+exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.deleteOrder = exports.getOrder = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
 const Orders_1 = __importDefault(require("../models/mysql/Orders"));
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
@@ -38,6 +38,17 @@ const getOrdersByUser = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getOrdersByUser = getOrdersByUser;
+const getOrdersNotPayed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userid } = req.params;
+    const ordersAux = yield Orders_1.default.findAll({ where: { userId: userid } && { payed: false } });
+    if (ordersAux) {
+        res.json(ordersAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, orders not found' });
+    }
+});
+exports.getOrdersNotPayed = getOrdersNotPayed;
 const getOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const OrderAux = yield Orders_1.default.findByPk(id);

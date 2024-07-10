@@ -33,6 +33,9 @@ const Order = connection_1.default.define('Orders', {
     },
     userdataId: {
         type: sequelize_1.DataTypes.STRING,
+    },
+    payed: {
+        type: sequelize_1.DataTypes.BOOLEAN,
     }
 });
 exports.default = Order;
