@@ -47,9 +47,12 @@ export const postPriceXproduct = async(req: Request, res: Response) => {
     })
 }
 export const updatePriceXproduct = async(req: Request, res: Response) => {
+    
     const body = req.body;
+    
     const { id } = req.params;
     const productAux = await PriceXproducts.findByPk(id);
+    
     if(productAux){
         productAux.update(body);
         res.json({

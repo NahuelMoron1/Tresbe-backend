@@ -15,6 +15,17 @@ export const getFeature = async (req: Request, res: Response) => {
         res.status(404).json({message: 'Error, Feature not found'})
     }
 }
+
+export const getProductFeatures = async (req: Request, res: Response) => {
+    const { productID } = req.params;
+    const FeatureAux = await Features.findAll({where: {product_id: productID}});    
+    if(FeatureAux){
+        res.json(FeatureAux);
+    } else {
+        res.status(404).json({message: 'Error, Features not found'})
+    }
+}
+
 export const deleteFeature = async (req: Request, res: Response) => {
     const { id } = req.params;
     const FeatureAux = await Features.findByPk(`${id}`);
