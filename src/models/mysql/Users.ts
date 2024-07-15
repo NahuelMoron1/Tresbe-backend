@@ -1,3 +1,4 @@
+import { timestamp } from 'rxjs';
 import db from '../../db/connection';
 import { DataTypes } from 'sequelize';
 
@@ -18,7 +19,10 @@ const Users = db.define('Users', {
     },
     priceList: {
         type: DataTypes.INTEGER
+    },
+    client: {
+        type: DataTypes.BOOLEAN
     }
-})
+}, {timestamps: false});
 
 export default Users;

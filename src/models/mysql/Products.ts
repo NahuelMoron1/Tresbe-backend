@@ -35,6 +35,9 @@ const Products = db.define('Products', {
     },
     priceDiscount: {
         type: DataTypes.FLOAT
+    },
+    optionSelected: {
+        type: DataTypes.STRING
     }
 })
 

@@ -38,6 +38,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 }
 export const postUser = async(req: Request, res: Response) => {
     const body = req.body;
+    
     await Users.create(body);
     res.json({
         message: 'User successfully created',

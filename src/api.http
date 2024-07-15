@@ -5,16 +5,15 @@ GET http://localhost:3000/api/products/5e574c5c-178f-11ef-a6ce-dd2b3fbae759
 ###
 DELETE http://localhost:3000/api/fuelXprice/1
 ###
-POST http://localhost:3000/api/products
+POST http://localhost:3000/api/Users/
 Content-Type: application/json
 
 {
-    "name": "Martillo",
-    "category": "Herramientas",
-    "price": 20,
-    "image": "",
-    "stock": 200,
-    "description": "aaasss"
+    "id": "cksnkfn33231",
+    "email": "pedro29@gmail.com",
+    "password": "Pedro123",
+    "username": "pedro22",
+    "priceList": 3
 }
 ###
 POST http://localhost:3000/api/operations
