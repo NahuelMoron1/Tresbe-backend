@@ -22,6 +22,9 @@ const Users = connection_1.default.define('Users', {
     },
     priceList: {
         type: sequelize_1.DataTypes.INTEGER
+    },
+    client: {
+        type: sequelize_1.DataTypes.BOOLEAN
     }
-});
+}, { timestamps: false });
 exports.default = Users;

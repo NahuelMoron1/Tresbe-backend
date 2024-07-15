@@ -39,6 +39,9 @@ const Products = connection_1.default.define('Products', {
     },
     priceDiscount: {
         type: sequelize_1.DataTypes.FLOAT
+    },
+    optionSelected: {
+        type: sequelize_1.DataTypes.STRING
     }
 });
 exports.default = Products;
