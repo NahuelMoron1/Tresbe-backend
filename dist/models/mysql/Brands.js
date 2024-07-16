@@ -16,5 +16,5 @@ const Brands = connection_1.default.define('Brands', {
     image: {
         type: sequelize_1.DataTypes.STRING,
     }
-});
+}, { timestamps: false });
 exports.default = Brands;

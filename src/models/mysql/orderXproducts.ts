@@ -16,6 +16,6 @@ const OrderXproducts = db.define('OrderXproducts', {
     quantity: {
         type: DataTypes.INTEGER,
     }
-});
+}, {timestamps: false});
 
 export { OrderXproducts };

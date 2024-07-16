@@ -19,6 +19,6 @@ const Comprobantes = db.define('Comprobantes', {
         type: DataTypes.BLOB('long'),
         allowNull: false
     }
-})
+}, {timestamps: false})
 
 export default Comprobantes;

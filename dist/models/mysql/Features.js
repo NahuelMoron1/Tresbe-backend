@@ -19,5 +19,5 @@ const Features = connection_1.default.define('Features', {
     value: {
         type: sequelize_1.DataTypes.STRING
     }
-});
+}, { timestamps: false });
 exports.default = Features;

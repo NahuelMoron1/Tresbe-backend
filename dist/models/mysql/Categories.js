@@ -16,5 +16,5 @@ const Categories = connection_1.default.define('Categories', {
     image: {
         type: sequelize_1.DataTypes.STRING,
     }
-});
+}, { timestamps: false });
 exports.default = Categories;

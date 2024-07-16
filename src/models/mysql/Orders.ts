@@ -33,6 +33,6 @@ const Order = db.define('Orders', {
     payed: {
         type: DataTypes.BOOLEAN,
     }
-});
+}, {timestamps: false});
 
 export default Order;

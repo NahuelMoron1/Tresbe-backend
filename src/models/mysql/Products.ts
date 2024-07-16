@@ -39,6 +39,6 @@ const Products = db.define('Products', {
     optionSelected: {
         type: DataTypes.STRING
     }
-})
+}, {timestamps: false})
 
 export default Products;

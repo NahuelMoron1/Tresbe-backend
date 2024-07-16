@@ -12,6 +12,6 @@ const Brands = db.define('Brands', {
     image: {
         type: DataTypes.STRING,
     }
-})
+}, {timestamps: false})
 
 export default Brands;

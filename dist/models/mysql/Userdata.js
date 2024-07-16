@@ -46,5 +46,5 @@ const Userdata = connection_1.default.define('Userdata', {
     saveIt: {
         type: sequelize_1.DataTypes.STRING
     }
-});
+}, { timestamps: false });
 exports.default = Userdata;

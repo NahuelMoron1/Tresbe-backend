@@ -20,5 +20,5 @@ const OrderXproducts = connection_1.default.define('OrderXproducts', {
     quantity: {
         type: sequelize_1.DataTypes.INTEGER,
     }
-});
+}, { timestamps: false });
 exports.OrderXproducts = OrderXproducts;

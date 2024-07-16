@@ -27,6 +27,6 @@ const Voucher = db.define('Vouchers', {
     description: {
         type: DataTypes.STRING
     }
-})
+}, {timestamps: false})
 
 export default Voucher;

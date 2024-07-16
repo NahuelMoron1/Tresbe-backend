@@ -23,5 +23,5 @@ const Comprobantes = connection_1.default.define('Comprobantes', {
         type: sequelize_1.DataTypes.BLOB('long'),
         allowNull: false
     }
-});
+}, { timestamps: false });
 exports.default = Comprobantes;
