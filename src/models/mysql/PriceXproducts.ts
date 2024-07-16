@@ -21,6 +21,6 @@ const PriceXproducts = db.define('PriceXproducts', {
     priceList4: {
         type: DataTypes.FLOAT
     }
-})
+}, {timestamps: false})
 
 export default PriceXproducts;

@@ -15,6 +15,6 @@ const Features = db.define('Features', {
     value: {
         type: DataTypes.STRING
     }
-})
+}, {timestamps: false})
 
 export default Features;

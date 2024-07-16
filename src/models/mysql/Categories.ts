@@ -12,6 +12,6 @@ const Categories = db.define('Categories', {
     image: {
         type: DataTypes.STRING,
     }
-})
+}, {timestamps: false})
 
 export default Categories;

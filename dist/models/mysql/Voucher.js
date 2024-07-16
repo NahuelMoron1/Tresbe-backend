@@ -31,5 +31,5 @@ const Voucher = connection_1.default.define('Vouchers', {
     description: {
         type: sequelize_1.DataTypes.STRING
     }
-});
+}, { timestamps: false });
 exports.default = Voucher;

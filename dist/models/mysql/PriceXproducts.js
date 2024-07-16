@@ -25,5 +25,5 @@ const PriceXproducts = connection_1.default.define('PriceXproducts', {
     priceList4: {
         type: sequelize_1.DataTypes.FLOAT
     }
-});
+}, { timestamps: false });
 exports.default = PriceXproducts;

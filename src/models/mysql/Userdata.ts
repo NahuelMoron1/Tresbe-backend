@@ -42,6 +42,6 @@ const Userdata = db.define('Userdata', {
     saveIt: {
         type: DataTypes.STRING
     }
-})
+}, {timestamps: false})
 
 export default Userdata;
