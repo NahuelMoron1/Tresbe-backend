@@ -5,25 +5,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const connection_1 = __importDefault(require("../../db/connection"));
 const sequelize_1 = require("sequelize");
-const PriceXproducts = connection_1.default.define('PriceXproducts', {
+const CartProduct = connection_1.default.define('CartProducts', {
     id: {
         type: sequelize_1.DataTypes.STRING,
         primaryKey: true,
     },
-    optionID: {
+    name: {
         type: sequelize_1.DataTypes.STRING,
     },
-    priceList1: {
+    price: {
         type: sequelize_1.DataTypes.FLOAT
     },
-    priceList2: {
-        type: sequelize_1.DataTypes.FLOAT
+    quantity: {
+        type: sequelize_1.DataTypes.INTEGER
     },
-    priceList3: {
-        type: sequelize_1.DataTypes.FLOAT
+    optionSelected: {
+        type: sequelize_1.DataTypes.STRING
     },
-    priceList4: {
-        type: sequelize_1.DataTypes.FLOAT
+    orderID: {
+        type: sequelize_1.DataTypes.STRING
     }
 }, { timestamps: false });
-exports.default = PriceXproducts;
+exports.default = CartProduct;

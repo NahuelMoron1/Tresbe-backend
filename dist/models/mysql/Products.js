@@ -42,6 +42,9 @@ const Products = connection_1.default.define('Products', {
     },
     optionSelected: {
         type: sequelize_1.DataTypes.STRING
+    },
+    latestID: {
+        type: sequelize_1.DataTypes.STRING
     }
 }, { timestamps: false });
 exports.default = Products;

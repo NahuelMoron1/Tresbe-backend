@@ -14,6 +14,7 @@ import db from '../db/connection';
 import tablePriceRouter from '../routes/PriceXproducts';
 import brandRouter from '../routes/Brands';
 import optionsRouter from '../routes/Options';
+import cartRouter from '../routes/CartProduct';
 
 class Server {
     private app: Application;
@@ -51,6 +52,7 @@ class Server {
         this.app.use('/api/tablePrice', tablePriceRouter);
         this.app.use('/api/brands', brandRouter);
         this.app.use('/api/options', optionsRouter);
+        this.app.use('/api/cart', cartRouter);
     }
     middlewares() {
         this.app.use(express.json());

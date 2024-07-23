@@ -1,26 +1,26 @@
 import db from '../../db/connection';
 import { DataTypes } from 'sequelize';
 
-const PriceXproducts = db.define('PriceXproducts', {
+const CartProduct = db.define('CartProducts', {
     id: {
         type: DataTypes.STRING,
         primaryKey: true,
     },
-    optionID: {
+    name: {
         type: DataTypes.STRING,
     },
-    priceList1: {
+    price: {
         type: DataTypes.FLOAT
     },
-    priceList2: {
-        type: DataTypes.FLOAT
+    quantity: {
+        type: DataTypes.INTEGER
     },
-    priceList3: {
-        type: DataTypes.FLOAT
+    optionSelected: {
+        type: DataTypes.STRING
     },
-    priceList4: {
-        type: DataTypes.FLOAT
+    orderID: {
+        type: DataTypes.STRING
     }
 }, {timestamps: false})
 
-export default PriceXproducts;
+export default CartProduct;

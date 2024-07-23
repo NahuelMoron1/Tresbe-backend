@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOptions = exports.updateOption = exports.postOption = exports.deleteOption = exports.getProductOptions = exports.getOption = exports.getOptions = void 0;
+exports.deleteOptions = exports.updateOption = exports.postOption = exports.deleteOption = exports.getProductOptionsByName = exports.getProductOptionsByTwo = exports.getProductOptions = exports.getOption = exports.getOptions = void 0;
 const Options_1 = __importDefault(require("../models/mysql/Options"));
 const getOptions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listOptions = yield Options_1.default.findAll();
@@ -41,6 +41,29 @@ const getProductOptions = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getProductOptions = getProductOptions;
+const getProductOptionsByTwo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { productID } = req.params;
+    const { optionName } = req.params;
+    const OptionAux = yield Options_1.default.findOne({ where: { name: optionName } && { productID: productID } });
+    if (OptionAux) {
+        res.json(OptionAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, Options not found' });
+    }
+});
+exports.getProductOptionsByTwo = getProductOptionsByTwo;
+const getProductOptionsByName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name } = req.params;
+    const OptionAux = yield Options_1.default.findOne({ where: { name: name } });
+    if (OptionAux) {
+        res.json(OptionAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, Options not found' });
+    }
+});
+exports.getProductOptionsByName = getProductOptionsByName;
 const deleteOption = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const OptionAux = yield Options_1.default.findByPk(`${id}`);

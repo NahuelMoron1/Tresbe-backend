@@ -17,11 +17,9 @@ export const getPriceXproduct = async (req: Request, res: Response) => {
 }
 
 export const getTableByProduct = async (req: Request, res: Response) => {
-    const { productID } = req.params;
+    const { optionID } = req.params;
     
-    const tableAux = await PriceXproducts.findOne({where: {productID: productID}});  
-    console.log('hellooo');
-      
+    const tableAux = await PriceXproducts.findOne({where: {optionID: optionID}});        
     if(tableAux){
         res.json(tableAux);
     } else {

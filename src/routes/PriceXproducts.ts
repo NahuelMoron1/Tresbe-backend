@@ -4,7 +4,7 @@ const router = Router();
 
 router.get('/', getPriceXproducts);
 router.get('/:id', getPriceXproduct);
-router.get('/product/:productID', getTableByProduct);
+router.get('/product/:optionID', getTableByProduct);
 router.delete('/:id', deletePriceXproduct);
 router.delete('/:', deletePriceXproducts);
 router.post('/', postPriceXproduct);
