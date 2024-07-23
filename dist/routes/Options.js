@@ -6,6 +6,8 @@ const router = (0, express_1.Router)();
 router.get('/', Options_1.getOptions);
 router.get('/:id', Options_1.getOption);
 router.get('/product/:productID', Options_1.getProductOptions);
+router.get('/product/option/:productID/:optionName', Options_1.getProductOptionsByTwo);
+router.get('/name/:name', Options_1.getProductOptionsByName);
 router.delete('/:id', Options_1.deleteOption);
 router.delete('/:', Options_1.deleteOptions);
 router.post('/', Options_1.postOption);

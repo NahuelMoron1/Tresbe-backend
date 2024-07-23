@@ -10,7 +10,7 @@ const PriceXproducts = connection_1.default.define('PriceXproducts', {
         type: sequelize_1.DataTypes.STRING,
         primaryKey: true,
     },
-    productID: {
+    optionID: {
         type: sequelize_1.DataTypes.STRING,
     },
     priceList1: {

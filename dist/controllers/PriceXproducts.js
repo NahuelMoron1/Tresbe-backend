@@ -31,9 +31,8 @@ const getPriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.getPriceXproduct = getPriceXproduct;
 const getTableByProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { productID } = req.params;
-    const tableAux = yield PriceXproducts_1.default.findOne({ where: { productID: productID } });
-    console.log('hellooo');
+    const { optionID } = req.params;
+    const tableAux = yield PriceXproducts_1.default.findOne({ where: { optionID: optionID } });
     if (tableAux) {
         res.json(tableAux);
     }

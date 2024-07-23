@@ -6,7 +6,7 @@ const PriceXproducts = db.define('PriceXproducts', {
         type: DataTypes.STRING,
         primaryKey: true,
     },
-    productID: {
+    optionID: {
         type: DataTypes.STRING,
     },
     priceList1: {

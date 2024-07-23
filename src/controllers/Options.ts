@@ -25,6 +25,26 @@ export const getProductOptions = async (req: Request, res: Response) => {
         res.status(404).json({message: 'Error, Options not found'})
     }
 }
+export const getProductOptionsByTwo = async (req: Request, res: Response) => {
+    const { productID } = req.params;
+    const { optionName } = req.params;
+    const OptionAux = await Options.findOne({where: {name: optionName} && {productID: productID}});    
+    if(OptionAux){
+        res.json(OptionAux);
+    } else {
+        res.status(404).json({message: 'Error, Options not found'})
+    }
+}
+
+export const getProductOptionsByName = async (req: Request, res: Response) => {
+    const { name } = req.params;
+    const OptionAux = await Options.findOne({where: {name: name}});    
+    if(OptionAux){
+        res.json(OptionAux);
+    } else {
+        res.status(404).json({message: 'Error, Options not found'})
+    }
+}
 
 export const deleteOption = async (req: Request, res: Response) => {
     const { id } = req.params;

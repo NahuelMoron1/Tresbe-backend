@@ -38,6 +38,9 @@ const Products = db.define('Products', {
     },
     optionSelected: {
         type: DataTypes.STRING
+    },
+    latestID: {
+        type: DataTypes.STRING
     }
 }, {timestamps: false})
 
