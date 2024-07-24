@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
 import Order from "../models/mysql/Orders";
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // Puedes usar otros servicios como Yahoo, Outlook, etc.
-    auth: {
-      user: 'info.tresbedistribuidora@gmail.com',
-      pass: 'Benfrabel2024'
-    }
-  });
 
 export const getOrders = async (req: Request, res: Response) => {    
     const listOrders = await Order.findAll();
@@ -36,6 +29,15 @@ export const getOrdersNotPayed = async (req: Request, res: Response) => {
     }
 }
 
+export const getOrdersAdmin = async (req: Request, res: Response) => {    
+    const ordersAux = await Order.findAll({where: {attended: 0}});
+    if(ordersAux){
+        res.json(ordersAux);
+    } else {
+        res.status(404).json({message: 'Error, orders not found'})
+    }
+}
+
 export const getOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
     const OrderAux = await Order.findByPk(id);    
@@ -47,6 +49,7 @@ export const getOrder = async (req: Request, res: Response) => {
 }
 export const deleteOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
+
     const OrderAux = await Order.findByPk(`${id}`);
     if(OrderAux){
         await OrderAux.destroy();
@@ -55,9 +58,35 @@ export const deleteOrder = async (req: Request, res: Response) => {
         res.status(404).json({message: 'Error, Order not found'})
     }
 }
+export const sendEmail = async (to: string, subject: string, text: string) => {
+    let transporter = nodemailer.createTransport({
+        service: 'Gmail', // Puedes usar otro servicio como 'Yahoo', 'Outlook', etc.
+        auth: {
+            user: 'info.tresbedistribuidora@gmail.com',
+            pass: 'tyfd wyjm qnle fgvt'
+        }
+    });
+
+    let mailOptions = {
+        from: 'info.tresbedistribuidora@gmail.com', // Remitente
+        to: to, // Destinatario
+        subject: subject, // Asunto
+        html: text, // Cuerpo del correo en texto plano
+        ///html: html // Cuerpo del correo en formato HTML (opcional)
+    };
+    try {
+        let info = await transporter.sendMail(mailOptions);
+        console.log('Correo enviado: %s', info.messageId);
+    } catch (error) {
+        console.error('Error al enviar el correo: ', error);
+    }
+}
 export const postOrder = async(req: Request, res: Response) => {
-    const body = req.body;
-    await Order.create(body);
+    const { order, to, subject, html } = req.body;
+
+    await Order.create(order);
+
+    await sendEmail(to, subject, html);
 
     res.json({
         message: 'Order successfully created',

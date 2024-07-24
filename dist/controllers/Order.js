@@ -12,16 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.deleteOrder = exports.getOrder = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
+exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.sendEmail = exports.deleteOrder = exports.getOrder = exports.getOrdersAdmin = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
 const Orders_1 = __importDefault(require("../models/mysql/Orders"));
-const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-    service: 'gmail', // Puedes usar otros servicios como Yahoo, Outlook, etc.
-    auth: {
-        user: 'info.tresbedistribuidora@gmail.com',
-        pass: 'Benfrabel2024'
-    }
-});
+const nodemailer_1 = __importDefault(require("nodemailer"));
 const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listOrders = yield Orders_1.default.findAll();
     res.json(listOrders);
@@ -49,6 +42,16 @@ const getOrdersNotPayed = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getOrdersNotPayed = getOrdersNotPayed;
+const getOrdersAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const ordersAux = yield Orders_1.default.findAll({ where: { attended: 0 } });
+    if (ordersAux) {
+        res.json(ordersAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, orders not found' });
+    }
+});
+exports.getOrdersAdmin = getOrdersAdmin;
 const getOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const OrderAux = yield Orders_1.default.findByPk(id);
@@ -72,9 +75,34 @@ const deleteOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteOrder = deleteOrder;
+const sendEmail = (to, subject, text) => __awaiter(void 0, void 0, void 0, function* () {
+    let transporter = nodemailer_1.default.createTransport({
+        service: 'Gmail', // Puedes usar otro servicio como 'Yahoo', 'Outlook', etc.
+        auth: {
+            user: 'info.tresbedistribuidora@gmail.com',
+            pass: 'tyfd wyjm qnle fgvt'
+        }
+    });
+    let mailOptions = {
+        from: 'info.tresbedistribuidora@gmail.com', // Remitente
+        to: to, // Destinatario
+        subject: subject, // Asunto
+        html: text, // Cuerpo del correo en texto plano
+        ///html: html // Cuerpo del correo en formato HTML (opcional)
+    };
+    try {
+        let info = yield transporter.sendMail(mailOptions);
+        console.log('Correo enviado: %s', info.messageId);
+    }
+    catch (error) {
+        console.error('Error al enviar el correo: ', error);
+    }
+});
+exports.sendEmail = sendEmail;
 const postOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield Orders_1.default.create(body);
+    const { order, to, subject, html } = req.body;
+    yield Orders_1.default.create(order);
+    yield (0, exports.sendEmail)(to, subject, html);
     res.json({
         message: 'Order successfully created',
     });
