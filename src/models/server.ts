@@ -15,6 +15,7 @@ import tablePriceRouter from '../routes/PriceXproducts';
 import brandRouter from '../routes/Brands';
 import optionsRouter from '../routes/Options';
 import cartRouter from '../routes/CartProduct';
+import { PORT } from './config';
 
 class Server {
     private app: Application;
@@ -26,7 +27,7 @@ class Server {
     })*/
     constructor() {
         this.app = express();
-        this.port = process.env.PORT || '3001';
+        this.port = PORT || '3001';
         this.listen();
         this.middlewares()
         this.routes();
@@ -34,7 +35,7 @@ class Server {
     }
     listen() {
         this.app.listen(this.port, () => {
-            console.log(`server listening on port ${process.env.PORT}`);
+            console.log(`server listening on port ${this.port}`);
         })
     }
     routes() {
