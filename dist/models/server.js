@@ -29,6 +29,7 @@ const PriceXproducts_1 = __importDefault(require("../routes/PriceXproducts"));
 const Brands_1 = __importDefault(require("../routes/Brands"));
 const Options_1 = __importDefault(require("../routes/Options"));
 const CartProduct_1 = __importDefault(require("../routes/CartProduct"));
+const config_1 = require("./config");
 class Server {
     /*private storage = multer.diskStorage({
         destination:(req, file, cb) => {
@@ -37,7 +38,7 @@ class Server {
     })*/
     constructor() {
         this.app = (0, express_1.default)();
-        this.port = process.env.PORT || '3001';
+        this.port = config_1.PORT || '3001';
         this.listen();
         this.middlewares();
         this.routes();
@@ -45,7 +46,7 @@ class Server {
     }
     listen() {
         this.app.listen(this.port, () => {
-            console.log(`server listening on port ${process.env.PORT}`);
+            console.log(`server listening on port ${this.port}`);
         });
     }
     routes() {
