@@ -18,7 +18,7 @@ const Users = db.define('Users', {
         type: DataTypes.STRING
     },
     priceList: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
     },
     client: {
         type: DataTypes.BOOLEAN
