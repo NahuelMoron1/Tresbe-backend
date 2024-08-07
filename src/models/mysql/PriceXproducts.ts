@@ -20,6 +20,15 @@ const PriceXproducts = db.define('PriceXproducts', {
     },
     priceList4: {
         type: DataTypes.FLOAT
+    },
+    priceListE: {
+        type: DataTypes.FLOAT
+    },
+    priceListG: {
+        type: DataTypes.FLOAT
+    },
+    costPrice: {
+        type: DataTypes.FLOAT
     }
 }, {timestamps: false})
 

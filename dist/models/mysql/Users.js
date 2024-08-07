@@ -21,7 +21,7 @@ const Users = connection_1.default.define('Users', {
         type: sequelize_1.DataTypes.STRING
     },
     priceList: {
-        type: sequelize_1.DataTypes.INTEGER
+        type: sequelize_1.DataTypes.STRING
     },
     client: {
         type: sequelize_1.DataTypes.BOOLEAN
