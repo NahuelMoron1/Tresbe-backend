@@ -67,8 +67,27 @@ const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.getProductsByCategory = getProductsByCategory;
 const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = req.params;
-    const productsAux = yield Products_1.default.findAll({ where: { name: { [sequelize_1.Op.like]: `%${name}%` } } });
+    const { name, brand } = req.params;
+    const searchWords = name.split(' ').map(word => word.toLowerCase());
+    const whereConditions = {
+        [sequelize_1.Op.and]: searchWords.map(word => ({
+            name: { [sequelize_1.Op.like]: `%${word}%` }
+        }))
+    };
+    // Agregar la condición de brand si no es 'all'
+    if (brand !== '' && brand != 'all') {
+        whereConditions[sequelize_1.Op.and].push({ brand: brand });
+    }
+    // Construimos la consulta para buscar todas las palabras
+    const productsAux = yield Products_1.default.findAll({
+        where: whereConditions
+    }); /*({
+        where: {
+            [Op.and]: searchWords.map(word => ({
+                name: { [Op.like]: `%${word}%` }
+            }))
+        }
+    });*/
     if (productsAux) {
         res.json(productsAux);
     }

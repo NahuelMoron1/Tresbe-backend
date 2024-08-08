@@ -54,9 +54,31 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
 }
 
 export const getProductsBySearch = async (req: Request, res: Response) => {
-    const { name } = req.params;
+    const { name, brand } = req.params;
+    const searchWords = name.split(' ').map(word => word.toLowerCase());
+
+    const whereConditions: any = {
+        [Op.and]: searchWords.map(word => ({
+            name: { [Op.like]: `%${word}%` }
+        }))
+    };
     
-    const productsAux = await Products.findAll({where: {name: {[Op.like]: `%${name}%`}}});
+    // Agregar la condición de brand si no es 'all'
+    if (brand !== '' && brand != 'all') {
+        whereConditions[Op.and].push({ brand: brand });
+    }
+
+    // Construimos la consulta para buscar todas las palabras
+    const productsAux = await Products.findAll({
+        where: whereConditions
+    });/*({
+        where: {
+            [Op.and]: searchWords.map(word => ({
+                name: { [Op.like]: `%${word}%` }
+            }))
+        }
+    });*/
+    
     if(productsAux){
         res.json(productsAux);
     } else {
