@@ -52,7 +52,7 @@ export const updatePriceXproduct = async(req: Request, res: Response) => {
     const productAux = await PriceXproducts.findByPk(id);
     
     if(productAux){
-        productAux.update(body);
+        await productAux.update(body);
         res.json({
             message: 'Product updated with success',
         })

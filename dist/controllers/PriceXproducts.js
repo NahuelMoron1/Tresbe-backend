@@ -66,7 +66,7 @@ const updatePriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, func
     const { id } = req.params;
     const productAux = yield PriceXproducts_1.default.findByPk(id);
     if (productAux) {
-        productAux.update(body);
+        yield productAux.update(body);
         res.json({
             message: 'Product updated with success',
         });
