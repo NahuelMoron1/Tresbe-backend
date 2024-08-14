@@ -119,6 +119,13 @@ exports.postProduct = postProduct;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { id } = req.params;
+    console.log("BODY");
+    console.log("BODY");
+    console.log("BODY");
+    console.log(body);
+    console.log("BODY");
+    console.log("BODY");
+    console.log("BODY");
     const productAux = yield Products_1.default.findByPk(id);
     if (productAux) {
         productAux.update(body);

@@ -41,6 +41,9 @@ const Products = db.define('Products', {
     },
     latestID: {
         type: DataTypes.STRING
+    },
+    sells: {
+        type: DataTypes.INTEGER
     }
 }, {timestamps: false})
 
