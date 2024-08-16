@@ -82,11 +82,13 @@ export const sendEmail = async (to: string, subject: string, text: string) => {
     }
 }
 export const postOrder = async(req: Request, res: Response) => {
-    const { order, to, subject, html } = req.body;
+    const { order, to, subject, html, htmlAux } = req.body;
 
     await Order.create(order);
 
     await sendEmail(to, subject, html);
+    let toAux = 'info.tresbedistribuidora@gmail.com'
+    await sendEmail(toAux, subject, htmlAux);
 
     res.json({
         message: 'Order successfully created',

@@ -44,6 +44,12 @@ const Products = db.define('Products', {
     },
     sells: {
         type: DataTypes.INTEGER
+    },
+    secondOption: {
+        type: DataTypes.STRING
+    },
+    color: {
+        type: DataTypes.STRING
     }
 }, {timestamps: false})
 
