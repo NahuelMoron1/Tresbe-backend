@@ -100,9 +100,11 @@ const sendEmail = (to, subject, text) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.sendEmail = sendEmail;
 const postOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { order, to, subject, html } = req.body;
+    const { order, to, subject, html, htmlAux } = req.body;
     yield Orders_1.default.create(order);
     yield (0, exports.sendEmail)(to, subject, html);
+    let toAux = 'info.tresbedistribuidora@gmail.com';
+    yield (0, exports.sendEmail)(toAux, subject, htmlAux);
     res.json({
         message: 'Order successfully created',
     });

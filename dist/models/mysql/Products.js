@@ -48,6 +48,12 @@ const Products = connection_1.default.define('Products', {
     },
     sells: {
         type: sequelize_1.DataTypes.INTEGER
+    },
+    secondOption: {
+        type: sequelize_1.DataTypes.STRING
+    },
+    color: {
+        type: sequelize_1.DataTypes.STRING
     }
 }, { timestamps: false });
 exports.default = Products;
