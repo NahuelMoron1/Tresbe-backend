@@ -1,4 +1,3 @@
-import { timestamp } from 'rxjs';
 import db from '../../db/connection';
 import { DataTypes } from 'sequelize';
 
