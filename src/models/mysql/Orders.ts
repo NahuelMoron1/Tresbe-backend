@@ -35,6 +35,9 @@ const Order = db.define('Orders', {
     },
     attended: {
         type: DataTypes.BOOLEAN,
+    },
+    username: {
+        type: DataTypes.STRING,
     }
 }, {timestamps: false});
 
