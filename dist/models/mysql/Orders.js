@@ -39,6 +39,9 @@ const Order = connection_1.default.define('Orders', {
     },
     attended: {
         type: sequelize_1.DataTypes.BOOLEAN,
+    },
+    username: {
+        type: sequelize_1.DataTypes.STRING,
     }
 }, { timestamps: false });
 exports.default = Order;
