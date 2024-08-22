@@ -27,6 +27,16 @@ export const getTableByProduct = async (req: Request, res: Response) => {
     }
 }
 
+export const deletePriceXproductByOptionID = async (id: number) => {
+    const productAux = await PriceXproducts.findOne({where: {optionID: id}});
+    if(productAux){
+        await productAux.destroy();
+        return 'DELETED';
+    } else{
+        return 'Error';
+    }
+}
+
 export const deletePriceXproduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     const productAux = await PriceXproducts.findByPk(`${id}`);

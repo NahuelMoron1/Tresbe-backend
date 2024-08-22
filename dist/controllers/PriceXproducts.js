@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePriceXproducts = exports.updatePriceXproduct = exports.postPriceXproduct = exports.deletePriceXproduct = exports.getTableByProduct = exports.getPriceXproduct = exports.getPriceXproducts = void 0;
+exports.deletePriceXproducts = exports.updatePriceXproduct = exports.postPriceXproduct = exports.deletePriceXproduct = exports.deletePriceXproductByOptionID = exports.getTableByProduct = exports.getPriceXproduct = exports.getPriceXproducts = void 0;
 const PriceXproducts_1 = __importDefault(require("../models/mysql/PriceXproducts"));
 const getPriceXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listProducts = yield PriceXproducts_1.default.findAll();
@@ -41,6 +41,17 @@ const getTableByProduct = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getTableByProduct = getTableByProduct;
+const deletePriceXproductByOptionID = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const productAux = yield PriceXproducts_1.default.findOne({ where: { optionID: id } });
+    if (productAux) {
+        yield productAux.destroy();
+        return 'DELETED';
+    }
+    else {
+        return 'Error';
+    }
+});
+exports.deletePriceXproductByOptionID = deletePriceXproductByOptionID;
 const deletePriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const productAux = yield PriceXproducts_1.default.findByPk(`${id}`);
