@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteOption, deleteOptions, getOption, getOptions, getProductOptions, getProductOptionsByName, getProductOptionsByTwo, postOption, updateOption } from "../controllers/Options";
+import { deleteOption, deleteOptionByProduct, deleteOptions, getOption, getOptions, getProductOptions, getProductOptionsByName, getProductOptionsByTwo, postOption, updateOption } from "../controllers/Options";
 const router = Router();
 
 router.get('/', getOptions);
@@ -8,6 +8,7 @@ router.get('/product/:productID', getProductOptions);
 router.get('/product/option/:productID/:optionName', getProductOptionsByTwo);
 router.get('/name/:name', getProductOptionsByName);
 router.delete('/:id', deleteOption);
+router.delete('/deleteProduct/:id', deleteOptionByProduct);
 router.delete('/:', deleteOptions);
 router.post('/', postOption);
 router.patch('/:id', updateOption);

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOptions = exports.updateOption = exports.postOption = exports.deleteOption = exports.getProductOptionsByName = exports.getProductOptionsByTwo = exports.getProductOptions = exports.getOption = exports.getOptions = void 0;
+exports.deleteOptions = exports.updateOption = exports.postOption = exports.deleteOption = exports.deleteOptionByProduct = exports.getProductOptionsByName = exports.getProductOptionsByTwo = exports.getProductOptions = exports.getOption = exports.getOptions = void 0;
 const Options_1 = __importDefault(require("../models/mysql/Options"));
 const getOptions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listOptions = yield Options_1.default.findAll();
@@ -64,6 +64,27 @@ const getProductOptionsByName = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getProductOptionsByName = getProductOptionsByName;
+const deleteOptionByProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const OptionAux = yield Options_1.default.findAll({ where: { productID: id } });
+    if (OptionAux) {
+        if (OptionAux.length > 0) {
+            if (OptionAux.length < 2) {
+                yield OptionAux[0].destroy();
+            }
+            else {
+                for (let i = 0; i < OptionAux.length; i++) {
+                    yield OptionAux[i].destroy();
+                }
+            }
+            res.json({ message: 'Options successfully deleted' });
+        }
+    }
+    else {
+        res.status(404).json({ message: 'Error, Options not found' });
+    }
+});
+exports.deleteOptionByProduct = deleteOptionByProduct;
 const deleteOption = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const OptionAux = yield Options_1.default.findByPk(`${id}`);

@@ -9,6 +9,7 @@ router.get('/product/:productID', Options_1.getProductOptions);
 router.get('/product/option/:productID/:optionName', Options_1.getProductOptionsByTwo);
 router.get('/name/:name', Options_1.getProductOptionsByName);
 router.delete('/:id', Options_1.deleteOption);
+router.delete('/deleteProduct/:id', Options_1.deleteOptionByProduct);
 router.delete('/:', Options_1.deleteOptions);
 router.post('/', Options_1.postOption);
 router.patch('/:id', Options_1.updateOption);

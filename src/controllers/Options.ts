@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Options from "../models/mysql/Options";
-
 export const getOptions = async (req: Request, res: Response) => {    
     const listOptions = await Options.findAll();
     res.json(listOptions);
@@ -42,6 +41,25 @@ export const getProductOptionsByName = async (req: Request, res: Response) => {
     if(OptionAux){
         res.json(OptionAux);
     } else {
+        res.status(404).json({message: 'Error, Options not found'})
+    }
+}
+
+export const deleteOptionByProduct = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const OptionAux = await Options.findAll({where: {productID: id}});
+    if(OptionAux){
+        if(OptionAux.length > 0){
+            if(OptionAux.length < 2){
+                await OptionAux[0].destroy();
+            }else{
+                for(let i = 0; i<OptionAux.length; i++){
+                    await OptionAux[i].destroy();
+                }
+            }
+            res.json({message: 'Options successfully deleted'});
+        }
+    } else{
         res.status(404).json({message: 'Error, Options not found'})
     }
 }
