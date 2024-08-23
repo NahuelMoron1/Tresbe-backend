@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Order from "../models/mysql/Orders";
 import nodemailer from 'nodemailer';
+import { Op } from "sequelize";
 
 
 export const getOrders = async (req: Request, res: Response) => {    
@@ -31,6 +32,27 @@ export const getOrdersNotPayed = async (req: Request, res: Response) => {
 
 export const getOrdersAdmin = async (req: Request, res: Response) => {    
     const ordersAux = await Order.findAll({where: {attended: 0}});
+    if(ordersAux){
+        res.json(ordersAux);
+    } else {
+        res.status(404).json({message: 'Error, orders not found'})
+    }
+}
+
+export const searchOrders = async (req: Request, res: Response) => {    
+    const { idcode } = req.params;
+    const { userid } = req.params;
+    const searchWords = idcode.split(' ').map(word => word.toLowerCase());
+    const whereConditions: any = {
+        [Op.and]: searchWords.map(word => ({
+            code: { [Op.like]: `%${word}%` }
+        }))
+    };
+    if(userid != undefined && userid != null && userid != ''){
+        whereConditions[Op.and].push({ userID: userid });
+    }
+    const ordersAux = await Order.findAll({where: whereConditions});
+    
     if(ordersAux){
         res.json(ordersAux);
     } else {

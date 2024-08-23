@@ -6,6 +6,8 @@ const router = (0, express_1.Router)();
 router.get('/', Order_1.getOrders);
 router.get('/user/debt/:userid', Order_1.getOrdersNotPayed);
 router.get('/admin/attended', Order_1.getOrdersAdmin);
+router.get('/search/code/:idcode', Order_1.searchOrders);
+router.get('/search/code/user/:idcode/:userid', Order_1.searchOrders);
 router.get('/user/:userid', Order_1.getOrdersByUser);
 router.get('/:id', Order_1.getOrder);
 router.delete('/:id', Order_1.deleteOrder);
