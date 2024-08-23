@@ -71,13 +71,7 @@ export const getProductsBySearch = async (req: Request, res: Response) => {
     // Construimos la consulta para buscar todas las palabras
     const productsAux = await Products.findAll({
         where: whereConditions
-    });/*({
-        where: {
-            [Op.and]: searchWords.map(word => ({
-                name: { [Op.like]: `%${word}%` }
-            }))
-        }
-    });*/
+    });
     
     if(productsAux){
         res.json(productsAux);
@@ -106,13 +100,6 @@ export const postProduct = async(req: Request, res: Response) => {
 export const updateProduct = async(req: Request, res: Response) => {
     const body = req.body;
     const { id } = req.params;
-    console.log("BODY");
-    console.log("BODY");
-    console.log("BODY");
-    console.log(body);
-    console.log("BODY");
-    console.log("BODY");
-    console.log("BODY");
 
     
     const productAux = await Products.findByPk(id);

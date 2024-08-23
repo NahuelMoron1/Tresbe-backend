@@ -81,13 +81,7 @@ const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, func
     // Construimos la consulta para buscar todas las palabras
     const productsAux = yield Products_1.default.findAll({
         where: whereConditions
-    }); /*({
-        where: {
-            [Op.and]: searchWords.map(word => ({
-                name: { [Op.like]: `%${word}%` }
-            }))
-        }
-    });*/
+    });
     if (productsAux) {
         res.json(productsAux);
     }
@@ -119,13 +113,6 @@ exports.postProduct = postProduct;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const { id } = req.params;
-    console.log("BODY");
-    console.log("BODY");
-    console.log("BODY");
-    console.log(body);
-    console.log("BODY");
-    console.log("BODY");
-    console.log("BODY");
     const productAux = yield Products_1.default.findByPk(id);
     if (productAux) {
         productAux.update(body);

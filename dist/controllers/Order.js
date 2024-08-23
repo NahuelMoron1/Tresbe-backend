@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.sendEmail = exports.deleteOrder = exports.getOrder = exports.getOrdersAdmin = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
+exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.sendEmail = exports.deleteOrder = exports.getOrder = exports.searchOrders = exports.getOrdersAdmin = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
 const Orders_1 = __importDefault(require("../models/mysql/Orders"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const sequelize_1 = require("sequelize");
 const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listOrders = yield Orders_1.default.findAll();
     res.json(listOrders);
@@ -52,6 +53,27 @@ const getOrdersAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getOrdersAdmin = getOrdersAdmin;
+const searchOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { idcode } = req.params;
+    const { userid } = req.params;
+    const searchWords = idcode.split(' ').map(word => word.toLowerCase());
+    const whereConditions = {
+        [sequelize_1.Op.and]: searchWords.map(word => ({
+            code: { [sequelize_1.Op.like]: `%${word}%` }
+        }))
+    };
+    if (userid != undefined && userid != null && userid != '') {
+        whereConditions[sequelize_1.Op.and].push({ userID: userid });
+    }
+    const ordersAux = yield Orders_1.default.findAll({ where: whereConditions });
+    if (ordersAux) {
+        res.json(ordersAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, orders not found' });
+    }
+});
+exports.searchOrders = searchOrders;
 const getOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const OrderAux = yield Orders_1.default.findByPk(id);
