@@ -15,6 +15,8 @@ import tablePriceRouter from '../routes/PriceXproducts';
 import brandRouter from '../routes/Brands';
 import optionsRouter from '../routes/Options';
 import cartRouter from '../routes/CartProduct';
+import emailRouter from '../routes/Email';
+
 import { PORT } from './config';
 
 class Server {
@@ -54,6 +56,7 @@ class Server {
         this.app.use('/api/brands', brandRouter);
         this.app.use('/api/options', optionsRouter);
         this.app.use('/api/cart', cartRouter);
+        this.app.use('/api/email', emailRouter);
     }
     middlewares() {
         this.app.use(express.json());
