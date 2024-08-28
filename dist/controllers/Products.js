@@ -32,8 +32,27 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getProducts = getProducts;
 const countPages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { brand } = req.params;
+    const { type } = req.params;
     const pageSize = 12; //Cantidad de elementos por pagina
-    const totalProducts = yield Products_1.default.count(); // Obtener el total de productos
+    let totalProducts = 0;
+    if (type == 'all') {
+        totalProducts = yield Products_1.default.count(); // Obtener el total de productos
+    }
+    else {
+        if (type == 'brand') {
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            totalProducts = yield Products_1.default.count({ where: { brand: brand } }); // Obtener el total de productos
+        }
+        else {
+            totalProducts = yield Products_1.default.count({ where: { category: brand } }); // Obtener el total de productos
+        }
+    }
     const totalPages = (totalProducts / pageSize);
     res.json(Math.ceil(totalPages));
 });
@@ -51,7 +70,19 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.getProduct = getProduct;
 const getProductsByBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { brand } = req.params;
-    const productsAux = yield Products_1.default.findAll({ where: { brand: brand } });
+    const { page } = req.params;
+    const pageNumb = parseInt(page);
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = yield Products_1.default.count(); // Obtener el total de productos
+    const totalPages = Math.ceil(totalProducts / pageSize);
+    // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
+    const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
+    const offset = (validPageNumb - 1) * pageSize;
+    const productsAux = yield Products_1.default.findAll({
+        where: { brand: brand },
+        limit: pageSize,
+        offset: offset,
+    });
     if (productsAux) {
         res.json(productsAux);
     }
@@ -75,7 +106,20 @@ const getRandomProducts = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getRandomProducts = getRandomProducts;
 const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { category } = req.params;
-    const productsAux = yield Products_1.default.findAll({ where: { category: category } });
+    const { brand } = req.params;
+    const { page } = req.params;
+    const pageNumb = parseInt(page);
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = yield Products_1.default.count(); // Obtener el total de productos
+    const totalPages = Math.ceil(totalProducts / pageSize);
+    // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
+    const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
+    const offset = (validPageNumb - 1) * pageSize;
+    const productsAux = yield Products_1.default.findAll({
+        where: { category: category },
+        limit: pageSize,
+        offset: offset,
+    });
     if (productsAux) {
         res.json(productsAux);
     }

@@ -19,11 +19,29 @@ export const getProducts = async (req: Request, res: Response) => {
 }
 
 export const countPages = async (req: Request, res: Response) => {
-   const pageSize = 12; //Cantidad de elementos por pagina
-    const totalProducts = await Products.count(); // Obtener el total de productos
-    
+    const { brand } = req.params;
+    const { type } = req.params;
+    const pageSize = 12; //Cantidad de elementos por pagina
+    let totalProducts = 0;
+    if(type == 'all'){
+        totalProducts = await Products.count(); // Obtener el total de productos
+    }else{
+        if(type == 'brand'){
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+            console.log("BRAND");
+
+            
+            totalProducts = await Products.count({where: {brand: brand}}); // Obtener el total de productos
+        }else{
+            totalProducts = await Products.count({where: {category: brand}}); // Obtener el total de productos
+        }
+    }
     const totalPages = (totalProducts / pageSize);
-    res.json(Math.ceil(totalPages));
+        res.json(Math.ceil(totalPages));
 }
 
 export const getProduct = async (req: Request, res: Response) => {
@@ -37,8 +55,20 @@ export const getProduct = async (req: Request, res: Response) => {
 }
 export const getProductsByBrands = async (req: Request, res: Response) => {
     const { brand } = req.params;
-    
-    const productsAux = await Products.findAll({where: {brand: brand}});
+    const { page } = req.params;
+    const pageNumb = parseInt(page);
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = await Products.count(); // Obtener el total de productos
+    const totalPages = Math.ceil(totalProducts / pageSize);
+    // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
+    const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
+    const offset = (validPageNumb - 1) * pageSize;
+
+    const productsAux = await Products.findAll({
+        where: {brand: brand},
+        limit: pageSize,
+        offset: offset,
+    });
     if(productsAux){
         res.json(productsAux);
     } else {
@@ -63,8 +93,21 @@ export const getRandomProducts = async (req: Request, res: Response) => {
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
     const { category } = req.params;
+    const { brand } = req.params;
+    const { page } = req.params;
+    const pageNumb = parseInt(page);
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = await Products.count(); // Obtener el total de productos
+    const totalPages = Math.ceil(totalProducts / pageSize);
+    // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
+    const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
+    const offset = (validPageNumb - 1) * pageSize;
     
-    const productsAux = await Products.findAll({where: {category: category}});
+    const productsAux = await Products.findAll({
+        where: {category: category},
+        limit: pageSize,
+        offset: offset,
+    });
     if(productsAux){
         res.json(productsAux);
     } else {
