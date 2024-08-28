@@ -2,9 +2,28 @@ import { Request, Response } from "express";
 import Products from "../models/mysql/Products";
 import { Op, QueryTypes } from "sequelize";
 
-export const getProducts = async (req: Request, res: Response) => {    
-    const listProducts = await Products.findAll();
+export const getProducts = async (req: Request, res: Response) => {  
+    const { page } = req.params;
+    const pageNumb = parseInt(page);
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = await Products.count(); // Obtener el total de productos
+    const totalPages = (totalProducts / pageSize);
+    // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
+    const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
+    const offset = (validPageNumb - 1) * pageSize;
+    const listProducts = await Products.findAll({
+        limit: pageSize,
+        offset: offset,
+    });
     res.json(listProducts);
+}
+
+export const countPages = async (req: Request, res: Response) => {
+   const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = await Products.count(); // Obtener el total de productos
+    
+    const totalPages = (totalProducts / pageSize);
+    res.json(Math.ceil(totalPages));
 }
 
 export const getProduct = async (req: Request, res: Response) => {
