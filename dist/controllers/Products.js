@@ -12,14 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProducts = exports.updateProduct = exports.postProduct = exports.deleteProduct = exports.getProductsBySearch = exports.getProductsByCategory = exports.getRandomProducts = exports.getProductsByBrands = exports.getProduct = exports.getProducts = void 0;
+exports.deleteProducts = exports.updateProduct = exports.postProduct = exports.deleteProduct = exports.getProductsBySearch = exports.getProductsByCategory = exports.getRandomProducts = exports.getProductsByBrands = exports.getProduct = exports.countPages = exports.getProducts = void 0;
 const Products_1 = __importDefault(require("../models/mysql/Products"));
 const sequelize_1 = require("sequelize");
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listProducts = yield Products_1.default.findAll();
+    const { page } = req.params;
+    const pageNumb = parseInt(page);
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = yield Products_1.default.count(); // Obtener el total de productos
+    const totalPages = (totalProducts / pageSize);
+    // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
+    const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
+    const offset = (validPageNumb - 1) * pageSize;
+    const listProducts = yield Products_1.default.findAll({
+        limit: pageSize,
+        offset: offset,
+    });
     res.json(listProducts);
 });
 exports.getProducts = getProducts;
+const countPages = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const pageSize = 12; //Cantidad de elementos por pagina
+    const totalProducts = yield Products_1.default.count(); // Obtener el total de productos
+    const totalPages = (totalProducts / pageSize);
+    res.json(Math.ceil(totalPages));
+});
+exports.countPages = countPages;
 const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const productAux = yield Products_1.default.findByPk(id);
