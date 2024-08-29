@@ -129,7 +129,7 @@ const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.getProductsByCategory = getProductsByCategory;
 const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, brand } = req.params;
+    const { name, value, type } = req.params;
     const searchWords = name.split(' ').map(word => word.toLowerCase());
     const whereConditions = {
         [sequelize_1.Op.and]: searchWords.map(word => ({
@@ -137,8 +137,13 @@ const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, func
         }))
     };
     // Agregar la condición de brand si no es 'all'
-    if (brand !== '' && brand != 'all') {
-        whereConditions[sequelize_1.Op.and].push({ brand: brand });
+    if (value !== '' && value != 'all') {
+        if (type == 'brand') {
+            whereConditions[sequelize_1.Op.and].push({ brand: value });
+        }
+        else if (type == 'category') {
+            whereConditions[sequelize_1.Op.and].push({ category: value });
+        }
     }
     // Construimos la consulta para buscar todas las palabras
     const productsAux = yield Products_1.default.findAll({

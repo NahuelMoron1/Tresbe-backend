@@ -116,7 +116,7 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
 }
 
 export const getProductsBySearch = async (req: Request, res: Response) => {
-    const { name, brand } = req.params;
+    const { name, value, type } = req.params;
     const searchWords = name.split(' ').map(word => word.toLowerCase());
 
     const whereConditions: any = {
@@ -126,8 +126,12 @@ export const getProductsBySearch = async (req: Request, res: Response) => {
     };
     
     // Agregar la condición de brand si no es 'all'
-    if (brand !== '' && brand != 'all') {
-        whereConditions[Op.and].push({ brand: brand });
+    if (value !== '' && value != 'all') {
+        if(type == 'brand'){
+            whereConditions[Op.and].push({ brand: value });
+        }else if(type == 'category'){
+            whereConditions[Op.and].push({ category: value });
+        }
     }
 
     // Construimos la consulta para buscar todas las palabras
