@@ -8,7 +8,7 @@ router.get('/random', getRandomProducts);
 router.get('/:id', getProduct);
 router.get('/brand/:brand/:page', getProductsByBrands);
 router.get('/category/:category/:page', getProductsByCategory);
-router.get('/search/:name/:brand', getProductsBySearch);
+router.get('/search/:name/:value/:type', getProductsBySearch);
 router.delete('/:id', deleteProduct);
 router.delete('/:', deleteProducts);
 router.post('/', postProduct);
