@@ -30,6 +30,8 @@ const Brands_1 = __importDefault(require("../routes/Brands"));
 const Options_1 = __importDefault(require("../routes/Options"));
 const CartProduct_1 = __importDefault(require("../routes/CartProduct"));
 const Email_1 = __importDefault(require("../routes/Email"));
+const Coupon_1 = __importDefault(require("../routes/Coupon"));
+const UserXcoupons_1 = __importDefault(require("../routes/UserXcoupons"));
 const config_1 = require("./config");
 class Server {
     /*private storage = multer.diskStorage({
@@ -67,6 +69,8 @@ class Server {
         this.app.use('/api/options', Options_1.default);
         this.app.use('/api/cart', CartProduct_1.default);
         this.app.use('/api/email', Email_1.default);
+        this.app.use('/api/coupon', Coupon_1.default);
+        this.app.use('/api/userXcoupon', UserXcoupons_1.default);
     }
     middlewares() {
         this.app.use(express_1.default.json());
