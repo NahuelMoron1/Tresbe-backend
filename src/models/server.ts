@@ -16,6 +16,8 @@ import brandRouter from '../routes/Brands';
 import optionsRouter from '../routes/Options';
 import cartRouter from '../routes/CartProduct';
 import emailRouter from '../routes/Email';
+import couponRouter from '../routes/Coupon';
+import userXcouponRouter from '../routes/UserXcoupons';
 
 import { PORT } from './config';
 
@@ -57,6 +59,9 @@ class Server {
         this.app.use('/api/options', optionsRouter);
         this.app.use('/api/cart', cartRouter);
         this.app.use('/api/email', emailRouter);
+        this.app.use('/api/coupon', couponRouter);
+        this.app.use('/api/userXcoupon', userXcouponRouter);
+
     }
     middlewares() {
         this.app.use(express.json());
