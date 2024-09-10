@@ -33,6 +33,7 @@ const Email_1 = __importDefault(require("../routes/Email"));
 const Coupon_1 = __importDefault(require("../routes/Coupon"));
 const UserXcoupons_1 = __importDefault(require("../routes/UserXcoupons"));
 const config_1 = require("./config");
+const config_2 = require("./config");
 class Server {
     /*private storage = multer.diskStorage({
         destination:(req, file, cb) => {
@@ -71,6 +72,9 @@ class Server {
         this.app.use('/api/email', Email_1.default);
         this.app.use('/api/coupon', Coupon_1.default);
         this.app.use('/api/userXcoupon', UserXcoupons_1.default);
+        this.app.get('/api/status', (req, res) => {
+            res.json(config_2.MAINTENANCE);
+        });
     }
     middlewares() {
         this.app.use(express_1.default.json());
@@ -78,12 +82,14 @@ class Server {
     }
     dbConnect() {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                yield connection_1.default.authenticate();
-                console.log("DATABASE CONNECTED");
-            }
-            catch (err) {
-                console.log("You have an error");
+            if (!config_2.MAINTENANCE) {
+                try {
+                    yield connection_1.default.authenticate();
+                    console.log("DATABASE CONNECTED");
+                }
+                catch (err) {
+                    console.log("You have an error");
+                }
             }
         });
     }

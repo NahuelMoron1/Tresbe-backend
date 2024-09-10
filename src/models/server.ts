@@ -20,6 +20,7 @@ import couponRouter from '../routes/Coupon';
 import userXcouponRouter from '../routes/UserXcoupons';
 
 import { PORT } from './config';
+import { MAINTENANCE } from './config';
 
 class Server {
     private app: Application;
@@ -61,6 +62,9 @@ class Server {
         this.app.use('/api/email', emailRouter);
         this.app.use('/api/coupon', couponRouter);
         this.app.use('/api/userXcoupon', userXcouponRouter);
+        this.app.get('/api/status', (req, res) => {
+            res.json(MAINTENANCE);
+          });
 
     }
     middlewares() {
@@ -68,11 +72,13 @@ class Server {
         this.app.use(cors());
     }
     async dbConnect() {
-        try{
-            await db.authenticate();
-        console.log("DATABASE CONNECTED");
-        }catch(err){
-            console.log("You have an error");
+        if(!MAINTENANCE){
+            try{
+                await db.authenticate();
+            console.log("DATABASE CONNECTED");
+            }catch(err){
+                console.log("You have an error");
+            }
         }
     }
 }

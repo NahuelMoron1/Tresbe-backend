@@ -30,3 +30,4 @@ export let DB_PORT: number = 3306;
 if(process.env.DB_PORT){
     DB_PORT = parseInt(process.env.DB_PORT) || 3306;
 }
+export const MAINTENANCE = process.env.MAINTENANCE || false;

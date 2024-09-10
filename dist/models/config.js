@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DB_PORT = exports.DB_NAME = exports.DB_PASSWORD = exports.DB_USER = exports.DB_HOST = exports.PORT = void 0;
+exports.MAINTENANCE = exports.DB_PORT = exports.DB_NAME = exports.DB_PASSWORD = exports.DB_USER = exports.DB_HOST = exports.PORT = void 0;
 exports.PORT = process.env.PORT || '3000';
 /*export let DB_HOST: string = '';
 if(process.env.DB_HOST){
@@ -32,3 +32,4 @@ exports.DB_PORT = 3306;
 if (process.env.DB_PORT) {
     exports.DB_PORT = parseInt(process.env.DB_PORT) || 3306;
 }
+exports.MAINTENANCE = process.env.MAINTENANCE || false;
