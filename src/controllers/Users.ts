@@ -26,6 +26,16 @@ export const getUserByEmail = async (req: Request, res: Response) => {
     }
 }
 
+export const getUserByName = async (req: Request, res: Response) => {
+    const { username } = req.params;
+    const UserAux = await Users.findOne({where: {username: username}});    
+    if(UserAux){
+        res.json(UserAux);
+    } else {
+        res.status(404).json({message: 'Error, User not found'})
+    }
+}
+
 export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     const UserAux = await Users.findByPk(`${id}`);
