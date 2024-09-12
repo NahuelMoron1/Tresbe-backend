@@ -7,6 +7,7 @@ const router = (0, express_1.Router)();
 router.get('/', Users_1.getUsers);
 router.get('/:id', Users_1.getUser);
 router.get('/email/:email', Users_1.getUserByEmail);
+router.get('/username/:username', Users_1.getUserByName);
 router.delete('/:id', Users_1.deleteUser);
 router.delete('/:', Users_1.deleteUsers);
 router.post('/', Users_1.postUser);
