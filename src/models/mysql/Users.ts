@@ -21,6 +21,9 @@ const Users = db.define('Users', {
     },
     client: {
         type: DataTypes.BOOLEAN
+    },
+    seller: {
+        type: DataTypes.STRING
     }
 }, {timestamps: false});
 

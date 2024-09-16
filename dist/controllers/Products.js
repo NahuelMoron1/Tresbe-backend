@@ -27,6 +27,10 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const listProducts = yield Products_1.default.findAll({
         limit: pageSize,
         offset: offset,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
+        ],
     });
     res.json(listProducts);
 });
@@ -82,6 +86,10 @@ const getProductsByBrands = (req, res) => __awaiter(void 0, void 0, void 0, func
         where: { brand: brand },
         limit: pageSize,
         offset: offset,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
+        ],
     });
     if (productsAux) {
         res.json(productsAux);
@@ -119,6 +127,10 @@ const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, fu
         where: { category: category },
         limit: pageSize,
         offset: offset,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
+        ],
     });
     if (productsAux) {
         res.json(productsAux);
@@ -147,7 +159,11 @@ const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
     // Construimos la consulta para buscar todas las palabras
     const productsAux = yield Products_1.default.findAll({
-        where: whereConditions
+        where: whereConditions,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
+        ],
     });
     if (productsAux) {
         res.json(productsAux);

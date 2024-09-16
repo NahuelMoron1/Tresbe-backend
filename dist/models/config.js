@@ -24,9 +24,9 @@ export let DB_PORT: number = 3306;
 if(process.env.DB_PORT){
     DB_PORT = parseInt(process.env.DB_PORT);
 }*/
-exports.DB_HOST = process.env.DB_HOST || 'localhost';
-exports.DB_USER = process.env.DB_USER || 'root';
-exports.DB_PASSWORD = process.env.DB_PASSWORD || 'Bocajuniors10';
+exports.DB_HOST = process.env.DB_HOST || '127.0.0.1';
+exports.DB_USER = process.env.DB_USER || 'moronnahuu';
+exports.DB_PASSWORD = process.env.DB_PASSWORD || 'Cacerola2611@';
 exports.DB_NAME = process.env.DB_NAME || 'tresbe';
 exports.DB_PORT = 3306;
 if (process.env.DB_PORT) {
