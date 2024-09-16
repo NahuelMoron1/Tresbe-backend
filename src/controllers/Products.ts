@@ -14,6 +14,10 @@ export const getProducts = async (req: Request, res: Response) => {
     const listProducts = await Products.findAll({
         limit: pageSize,
         offset: offset,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
+        ], 
     });
     res.json(listProducts);
 }
@@ -68,6 +72,10 @@ export const getProductsByBrands = async (req: Request, res: Response) => {
         where: {brand: brand},
         limit: pageSize,
         offset: offset,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
+        ],
     });
     if(productsAux){
         res.json(productsAux);
@@ -107,6 +115,10 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
         where: {category: category},
         limit: pageSize,
         offset: offset,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
+        ],
     });
     if(productsAux){
         res.json(productsAux);
@@ -136,7 +148,11 @@ export const getProductsBySearch = async (req: Request, res: Response) => {
 
     // Construimos la consulta para buscar todas las palabras
     const productsAux = await Products.findAll({
-        where: whereConditions
+        where: whereConditions,
+        order: [
+            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
+            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
+        ],
     });
     
     if(productsAux){

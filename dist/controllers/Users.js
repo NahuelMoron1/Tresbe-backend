@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUsers = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
+exports.deleteUsers = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUsersBySeller = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
 const Users_1 = __importDefault(require("../models/mysql/Users"));
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listUsers = yield Users_1.default.findAll();
@@ -41,6 +41,17 @@ const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getUserByEmail = getUserByEmail;
+const getUsersBySeller = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { seller } = req.params;
+    const UserAux = yield Users_1.default.findAll({ where: { seller: seller } });
+    if (UserAux) {
+        res.json(UserAux);
+    }
+    else {
+        res.status(404).json({ message: 'Error, User not found' });
+    }
+});
+exports.getUsersBySeller = getUsersBySeller;
 const getUserByName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username } = req.params;
     const UserAux = yield Users_1.default.findOne({ where: { username: username } });

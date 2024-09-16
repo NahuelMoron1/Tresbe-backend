@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, response, Response } from 'express';
 import cors from 'cors';
 /*import multer from 'multer'
 import sharp from 'sharp';*/
@@ -77,7 +77,10 @@ class Server {
                 await db.authenticate();
             console.log("DATABASE CONNECTED");
             }catch(err){
+                
                 console.log("You have an error");
+                console.log(err);
+                
             }
         }
     }

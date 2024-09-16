@@ -89,6 +89,7 @@ class Server {
                 }
                 catch (err) {
                     console.log("You have an error");
+                    console.log(err);
                 }
             }
         });
