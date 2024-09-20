@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOrdersXproducts = exports.updateOrderXproducts = exports.postOrderXproducts = exports.deleteOrderXproducts = exports.getOxpByOrders = exports.getOrderXproducts = exports.getOrdersXproducts = void 0;
+exports.deleteOrdersXproducts = exports.updateOrderXproducts = exports.postOrderXproducts = exports.deleteOrderXproductsByIDs = exports.deleteOrderXproducts = exports.getOxpByOrders = exports.getOrderXproducts = exports.getOrdersXproducts = void 0;
 const orderXproducts_1 = require("../models/mysql/orderXproducts");
 const getOrdersXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listOrders = yield orderXproducts_1.OrderXproducts.findAll();
@@ -51,6 +51,19 @@ const deleteOrderXproducts = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.deleteOrderXproducts = deleteOrderXproducts;
+const deleteOrderXproductsByIDs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { productID } = req.params;
+    const { orderID } = req.params;
+    const OrderAux = yield orderXproducts_1.OrderXproducts.findOne({ where: { productId: productID } && { orderId: orderID } });
+    if (OrderAux) {
+        yield OrderAux.destroy();
+        res.json({ message: 'OrderXproducts successfully deleted' });
+    }
+    else {
+        res.status(404).json({ message: 'Error, Order not found' });
+    }
+});
+exports.deleteOrderXproductsByIDs = deleteOrderXproductsByIDs;
 const postOrderXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     yield orderXproducts_1.OrderXproducts.create(body);

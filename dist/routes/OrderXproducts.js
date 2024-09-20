@@ -7,6 +7,7 @@ router.get('/', OrderXproducts_1.getOrdersXproducts);
 router.get('/orders/:orderid', OrderXproducts_1.getOxpByOrders);
 router.get('/:id', OrderXproducts_1.getOrderXproducts);
 router.delete('/:id', OrderXproducts_1.deleteOrderXproducts);
+router.delete('/products/:productID/:orderID', OrderXproducts_1.deleteOrderXproductsByIDs);
 router.delete('/:', OrderXproducts_1.deleteOrdersXproducts);
 router.post('/', OrderXproducts_1.postOrderXproducts);
 router.patch('/:id', OrderXproducts_1.updateOrderXproducts);

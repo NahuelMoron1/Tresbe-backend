@@ -14,8 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBrands = exports.updateBrand = exports.postBrands = exports.deleteBrand = exports.getBrand = exports.getBrands = void 0;
 const Brands_1 = __importDefault(require("../models/mysql/Brands"));
+const connection_1 = __importDefault(require("../db/connection"));
 const getBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listBrands = yield Brands_1.default.findAll();
+    const listBrands = yield Brands_1.default.findAll({
+        order: [
+            // Primero ponemos las marcas cuyo nombre es 'Tel'
+            [connection_1.default.literal(`CASE WHEN name = 'Tel' THEN 0 ELSE 1 END`), 'ASC'],
+            // Luego ordenamos las demás marcas en orden descendente por name
+            ['name', 'DESC']
+        ]
+    });
     res.json(listBrands);
 });
 exports.getBrands = getBrands;

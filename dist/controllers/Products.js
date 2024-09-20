@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProducts = exports.updateProduct = exports.postProduct = exports.deleteProduct = exports.getProductsBySearch = exports.getProductsByCategory = exports.getRandomProducts = exports.getProductsByBrands = exports.getProduct = exports.countPages = exports.getProducts = void 0;
 const Products_1 = __importDefault(require("../models/mysql/Products"));
 const sequelize_1 = require("sequelize");
+const connection_1 = __importDefault(require("../db/connection"));
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { page } = req.params;
     const pageNumb = parseInt(page);
@@ -28,9 +29,11 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         limit: pageSize,
         offset: offset,
         order: [
-            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
-            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
-        ],
+            [connection_1.default.literal(`(brand = 'Tel')`), 'DESC'], // Priorizar los productos de marca 'Tel'
+            ['category', 'ASC'], // Luego ordenar por categoría
+            ['stock', 'ASC'], // Después ordenar por stock
+            ['brand', 'ASC'] // Finalmente ordenar alfabéticamente por marca
+        ]
     });
     res.json(listProducts);
 });
@@ -45,12 +48,6 @@ const countPages = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     else {
         if (type == 'brand') {
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
             totalProducts = yield Products_1.default.count({ where: { brand: brand } }); // Obtener el total de productos
         }
         else {
@@ -88,7 +85,7 @@ const getProductsByBrands = (req, res) => __awaiter(void 0, void 0, void 0, func
         offset: offset,
         order: [
             ['category', 'ASC'], // Ordenar por `category` en orden ascendente
-            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
+            ['stock', 'ASC'], // Ordenar por `category` en orden ascendente
         ],
     });
     if (productsAux) {
@@ -101,7 +98,7 @@ const getProductsByBrands = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.getProductsByBrands = getProductsByBrands;
 const getRandomProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const products = yield ((_a = Products_1.default.sequelize) === null || _a === void 0 ? void 0 : _a.query(`SELECT * FROM Products ORDER BY RAND() LIMIT 3`, {
+    const products = yield ((_a = Products_1.default.sequelize) === null || _a === void 0 ? void 0 : _a.query(`SELECT * FROM Products WHERE brand = 'Tel' ORDER BY RAND() LIMIT 3`, {
         type: sequelize_1.QueryTypes.SELECT
     }));
     if (products) {
@@ -114,7 +111,6 @@ const getRandomProducts = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getRandomProducts = getRandomProducts;
 const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { category } = req.params;
-    const { brand } = req.params;
     const { page } = req.params;
     const pageNumb = parseInt(page);
     const pageSize = 12; //Cantidad de elementos por pagina
@@ -129,7 +125,7 @@ const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, fu
         offset: offset,
         order: [
             ['category', 'ASC'], // Ordenar por `category` en orden ascendente
-            ['name', 'ASC'] // Ordenar por `name` en orden ascendente
+            ['stock', 'ASC'] // Ordenar por `name` en orden ascendente
         ],
     });
     if (productsAux) {

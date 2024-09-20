@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Products from "../models/mysql/Products";
 import { Op, QueryTypes } from "sequelize";
+import sequelize from "../db/connection";
 
 export const getProducts = async (req: Request, res: Response) => {  
     const { page } = req.params;
@@ -15,9 +16,11 @@ export const getProducts = async (req: Request, res: Response) => {
         limit: pageSize,
         offset: offset,
         order: [
-            ['category', 'ASC'], // Ordenar por `category` en orden ascendente
-            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
-        ], 
+            [sequelize.literal(`(brand = 'Tel')`), 'DESC'],  // Priorizar los productos de marca 'Tel'
+            ['category', 'ASC'],                             // Luego ordenar por categoría
+            ['stock', 'ASC'],                                // Después ordenar por stock
+            ['brand', 'ASC']                                 // Finalmente ordenar alfabéticamente por marca
+        ]
     });
     res.json(listProducts);
 }
@@ -31,14 +34,6 @@ export const countPages = async (req: Request, res: Response) => {
         totalProducts = await Products.count(); // Obtener el total de productos
     }else{
         if(type == 'brand'){
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-            console.log("BRAND");
-
-            
             totalProducts = await Products.count({where: {brand: brand}}); // Obtener el total de productos
         }else{
             totalProducts = await Products.count({where: {category: brand}}); // Obtener el total de productos
@@ -74,7 +69,7 @@ export const getProductsByBrands = async (req: Request, res: Response) => {
         offset: offset,
         order: [
             ['category', 'ASC'], // Ordenar por `category` en orden ascendente
-            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
+            ['stock', 'ASC'], // Ordenar por `category` en orden ascendente
         ],
     });
     if(productsAux){
@@ -86,7 +81,7 @@ export const getProductsByBrands = async (req: Request, res: Response) => {
 
 export const getRandomProducts = async (req: Request, res: Response) => {
     const products = await Products.sequelize?.query(
-      `SELECT * FROM Products ORDER BY RAND() LIMIT 3`,
+      `SELECT * FROM Products WHERE brand = 'Tel' ORDER BY RAND() LIMIT 3`,
       {
         type: QueryTypes.SELECT
       }
@@ -101,7 +96,6 @@ export const getRandomProducts = async (req: Request, res: Response) => {
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
     const { category } = req.params;
-    const { brand } = req.params;
     const { page } = req.params;
     const pageNumb = parseInt(page);
     const pageSize = 12; //Cantidad de elementos por pagina
@@ -117,7 +111,7 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
         offset: offset,
         order: [
             ['category', 'ASC'], // Ordenar por `category` en orden ascendente
-            ['name', 'ASC']       // Ordenar por `name` en orden ascendente
+            ['stock', 'ASC']       // Ordenar por `name` en orden ascendente
         ],
     });
     if(productsAux){

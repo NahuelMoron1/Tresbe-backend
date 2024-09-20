@@ -25,6 +25,22 @@ const Users = db.define('Users', {
     seller: {
         type: DataTypes.STRING
     }
-}, {timestamps: false});
+}, {
+    timestamps: false,
+    defaultScope: {
+        attributes: { exclude: ['password', 'priceList', 'seller'] }, // Excluir 'password' por defecto
+    },
+    scopes: {
+        withPassword: {
+            attributes: { include: ['password'] }, // Incluir 'password' solo cuando se use este scope
+        },
+        withPriceList: {
+            attributes: { include: ['priceList'] }, // Incluir 'password' solo cuando se use este scope
+        },
+        withAll: {
+            attributes: { include: ['password', 'priceList', 'seller'] }, // Incluir 'password' solo cuando se use este scope
+        },
+    },
+});
 
 export default Users;

@@ -1,8 +1,16 @@
 import { Request, Response } from "express";
 import Brands from "../models/mysql/Brands";
+import sequelize from "../db/connection";
 
 export const getBrands = async (req: Request, res: Response) => {    
-    const listBrands = await Brands.findAll();
+    const listBrands = await Brands.findAll({
+        order: [
+            // Primero ponemos las marcas cuyo nombre es 'Tel'
+            [sequelize.literal(`CASE WHEN name = 'Tel' THEN 0 ELSE 1 END`), 'ASC'],
+            // Luego ordenamos las demás marcas en orden descendente por name
+            ['name', 'DESC']
+        ]
+    });
     res.json(listBrands);
 }
 
