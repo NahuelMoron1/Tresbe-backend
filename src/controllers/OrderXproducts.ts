@@ -38,6 +38,17 @@ export const deleteOrderXproducts = async (req: Request, res: Response) => {
         res.status(404).json({message: 'Error, Order not found'})
     }
 }
+export const deleteOrderXproductsByIDs = async (req: Request, res: Response) => {
+    const { productID } = req.params;
+    const { orderID } = req.params;
+    const OrderAux = await OrderXproducts.findOne({where: {productId: productID} && {orderId: orderID}});
+    if(OrderAux){
+        await OrderAux.destroy();
+        res.json({message: 'OrderXproducts successfully deleted'});
+    } else{
+        res.status(404).json({message: 'Error, Order not found'})
+    }
+}
 export const postOrderXproducts = async(req: Request, res: Response) => {
     const body = req.body;
     await OrderXproducts.create(body);

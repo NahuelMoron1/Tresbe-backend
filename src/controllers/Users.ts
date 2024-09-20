@@ -1,28 +1,94 @@
 import { Request, Response } from "express";
 import Users from "../models/mysql/Users";
-
-export const getUsers = async (req: Request, res: Response) => {    
-    const listUsers = await Users.findAll();
-    res.json(listUsers);
+import bcrypt from 'bcrypt';
+import { User } from "../models/User";
+import { PublicUser } from "../models/PublicUser";
+import { admin } from "../models/config";
+export const getUsers = async (req: Request, res: Response) => {
+    const { email } = req.params;
+    if(email != admin){
+        const listUsers = await Users.findAll();
+        let users: PublicUser[] = [];
+        if(listUsers){
+            users = listUsers.map(user => user.toJSON() as PublicUser);
+        }
+        res.json(users);
+    }else if(email == admin){
+        const listUsers = await Users.scope('withAll').findAll();
+        let users: User[] = [];
+        if(listUsers){
+            users = listUsers.map(user => user.toJSON() as User);
+        }
+        res.json(users);
+    }else{
+        res.status(501).json({message: "Bad Request for users"});
+    }
 }
 
 export const getUser = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const UserAux = await Users.findByPk(id);    
+    const { id, email } = req.params;
+    if(email != admin){
+        const UserAux = await Users.findByPk(id);    
+        if(UserAux){
+            res.json(UserAux);
+        } else {
+            res.status(404).json({message: 'Error, User not found'})
+        }
+    }else{
+        const UserAux = await Users.scope('withAll').findByPk(id);    
     if(UserAux){
         res.json(UserAux);
     } else {
         res.status(404).json({message: 'Error, User not found'})
     }
+    }
 }
 
 export const getUserByEmail = async (req: Request, res: Response) => {
-    const { email } = req.params;
-    const UserAux = await Users.findOne({where: {email: email}});    
-    if(UserAux){
-        res.json(UserAux);
-    } else {
-        res.status(404).json({message: 'Error, User not found'})
+    const { email, loggedEmail } = req.params;
+    if(loggedEmail != admin){
+        const UserAux = await Users.scope('withAll').findOne({where: {email: email}});   
+        if(UserAux){
+            res.json(UserAux);
+        } else {
+            res.status(404).json({message: 'Error, User not found'})
+        }
+    }else{
+        const UserAux = await Users.scope('withAll').findOne({where: {email: email}});    
+        if(UserAux){
+            res.json(UserAux);
+        } else {
+            res.status(404).json({message: 'Error, User not found'})
+        }
+    }
+}
+
+export const login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const userAux = await loginCheck(email, password);
+    let userValidated: User = new User('','','','',false,'','');
+    if(userAux != null){
+        userValidated = userAux;
+        ///let publicUser: PublicUser = new PublicUser(userValidated.id, userValidated.email, userValidated.username, userValidated.pricelist, userValidated.client, userValidated.seller);
+        res.json(userValidated);
+    }else{
+        res.status(404).json({message: 'Error al iniciar sesion'});
+    }
+}
+
+async function loginCheck(email: string, password: string){
+    const user = await Users.scope('withAll').findOne({where: {email: email}});
+    let userAux: User = new User('','','','',false,'','');
+    if(user != null){
+        userAux = user.toJSON() as User;
+        let access = await bcrypt.compare(password, userAux.password);
+        if(access){
+            return userAux;
+        }else{
+            return null;
+        }
+    }else{
+        return null;
     }
 }
 
@@ -57,16 +123,26 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
 }
 export const postUser = async(req: Request, res: Response) => {
-    const body = req.body;
-    
-    await Users.create(body);
+    let {id, email, username, priceList, client, seller, password} = req.body;
+    let hashedPassword = await bcrypt.hash(password, 10);
+    const user = {
+        id,
+        email,
+        username,
+        priceList,
+        client,
+        seller,
+        password: hashedPassword  // Guardar la contraseña hasheada
+    };
+    await Users.create(user);
     res.json({
-        message: 'User successfully created',
+        message: `User successfully created with hashed password: ${user}`,
     })
 }
 export const updateUser = async(req: Request, res: Response) => {
     const body = req.body;
     const { id } = req.params;
+    body.password = await bcrypt.hash(body.password, 10);
     const UserAux = await Users.findByPk(id);
     if(UserAux){
         UserAux.update(body);

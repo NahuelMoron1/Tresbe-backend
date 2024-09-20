@@ -29,5 +29,21 @@ const Users = connection_1.default.define('Users', {
     seller: {
         type: sequelize_1.DataTypes.STRING
     }
-}, { timestamps: false });
+}, {
+    timestamps: false,
+    defaultScope: {
+        attributes: { exclude: ['password', 'priceList', 'seller'] }, // Excluir 'password' por defecto
+    },
+    scopes: {
+        withPassword: {
+            attributes: { include: ['password'] }, // Incluir 'password' solo cuando se use este scope
+        },
+        withPriceList: {
+            attributes: { include: ['priceList'] }, // Incluir 'password' solo cuando se use este scope
+        },
+        withAll: {
+            attributes: { include: ['password', 'priceList', 'seller'] }, // Incluir 'password' solo cuando se use este scope
+        },
+    },
+});
 exports.default = Users;

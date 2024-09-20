@@ -1,16 +1,17 @@
 import { Router } from "express";
-import { deleteUser, deleteUsers, getUser, getUserByEmail, getUserByName, getUsers, getUsersBySeller, postUser, updateUser } from "../controllers/Users";
+import { deleteUser, deleteUsers, getUser, getUserByEmail, getUserByName, getUsers, getUsersBySeller, login, postUser, updateUser } from "../controllers/Users";
 import { sendEmail } from "../controllers/Email";
 const router = Router();
 
-router.get('/', getUsers);
-router.get('/:id', getUser);
-router.get('/email/:email', getUserByEmail);
-router.get('/seller/:seller', getUsersBySeller);
-router.get('/username/:username', getUserByName);
+router.get('/:email', getUsers);
+router.get('/:id/:email', getUser);
+router.get('/email/:email/:loggedEmail', getUserByEmail);
+router.get('/seller/:seller/:email', getUsersBySeller);
+router.get('/username/:username/:email', getUserByName);
 router.delete('/:id', deleteUser);
-router.delete('/:', deleteUsers);
+router.delete('/', deleteUsers);
 router.post('/', postUser);
+router.post('/login', login);
 router.post('/email', sendEmail);
 router.patch('/:id', updateUser);
 
