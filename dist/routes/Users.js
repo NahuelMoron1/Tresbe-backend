@@ -13,6 +13,7 @@ router.delete('/:id', Users_1.deleteUser);
 router.delete('/', Users_1.deleteUsers);
 router.post('/', Users_1.postUser);
 router.post('/login', Users_1.login);
+router.post('/tempLogin', Users_1.temporalLogin);
 router.post('/email', Email_1.sendEmail);
 router.patch('/:id', Users_1.updateUser);
 exports.default = router;

@@ -17,9 +17,11 @@ import optionsRouter from '../routes/Options';
 import cartRouter from '../routes/CartProduct';
 import emailRouter from '../routes/Email';
 import couponRouter from '../routes/Coupon';
+import cookieRouter from '../routes/Cookies';
 import userXcouponRouter from '../routes/UserXcoupons';
+import cookieParser from "cookie-parser";
 
-import { PORT } from './config';
+import { DB_NAME, PORT } from './config';
 import { MAINTENANCE } from './config';
 
 class Server {
@@ -62,20 +64,26 @@ class Server {
         this.app.use('/api/email', emailRouter);
         this.app.use('/api/coupon', couponRouter);
         this.app.use('/api/userXcoupon', userXcouponRouter);
+        this.app.use('/api/cookies', cookieRouter);
         this.app.get('/api/status', (req, res) => {
             res.json(MAINTENANCE);
           });
 
     }
     middlewares() {
+        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com'];
         this.app.use(express.json());
-        this.app.use(cors());
+        this.app.use(cors({
+            origin: allowedOrigins,
+            credentials: true
+        }));
+        this.app.use(cookieParser());
     }
     async dbConnect() {
         if(!MAINTENANCE){
             try{
                 await db.authenticate();
-            console.log("DATABASE CONNECTED");
+            console.log("DATABASE CONNECTED: "+DB_NAME);
             }catch(err){
                 
                 console.log("You have an error");

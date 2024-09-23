@@ -31,7 +31,9 @@ const Options_1 = __importDefault(require("../routes/Options"));
 const CartProduct_1 = __importDefault(require("../routes/CartProduct"));
 const Email_1 = __importDefault(require("../routes/Email"));
 const Coupon_1 = __importDefault(require("../routes/Coupon"));
+const Cookies_1 = __importDefault(require("../routes/Cookies"));
 const UserXcoupons_1 = __importDefault(require("../routes/UserXcoupons"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const config_1 = require("./config");
 const config_2 = require("./config");
 class Server {
@@ -72,20 +74,26 @@ class Server {
         this.app.use('/api/email', Email_1.default);
         this.app.use('/api/coupon', Coupon_1.default);
         this.app.use('/api/userXcoupon', UserXcoupons_1.default);
+        this.app.use('/api/cookies', Cookies_1.default);
         this.app.get('/api/status', (req, res) => {
             res.json(config_2.MAINTENANCE);
         });
     }
     middlewares() {
+        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com'];
         this.app.use(express_1.default.json());
-        this.app.use((0, cors_1.default)());
+        this.app.use((0, cors_1.default)({
+            origin: allowedOrigins,
+            credentials: true
+        }));
+        this.app.use((0, cookie_parser_1.default)());
     }
     dbConnect() {
         return __awaiter(this, void 0, void 0, function* () {
             if (!config_2.MAINTENANCE) {
                 try {
                     yield connection_1.default.authenticate();
-                    console.log("DATABASE CONNECTED");
+                    console.log("DATABASE CONNECTED: " + config_1.DB_NAME);
                 }
                 catch (err) {
                     console.log("You have an error");
