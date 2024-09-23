@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import { User } from "../models/User";
 import { PublicUser } from "../models/PublicUser";
 import { admin } from "../models/config";
+import jwt from "jsonwebtoken";
+import { SECRET_JWT_KEY } from "../models/config";
 export const getUsers = async (req: Request, res: Response) => {
     const { email } = req.params;
     if(email != admin){
@@ -62,6 +64,17 @@ export const getUserByEmail = async (req: Request, res: Response) => {
         }
     }
 }
+export const temporalLogin = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const userAux = await loginCheck(email, password);
+    let userValidated: User = new User('','','','',false,'','');
+    if(userAux != null){
+        userValidated = userAux;
+        res.json(userValidated);
+    }else{
+        res.status(404).json({message: 'Error al iniciar sesion'});
+    }
+}
 
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -69,8 +82,17 @@ export const login = async (req: Request, res: Response) => {
     let userValidated: User = new User('','','','',false,'','');
     if(userAux != null){
         userValidated = userAux;
-        ///let publicUser: PublicUser = new PublicUser(userValidated.id, userValidated.email, userValidated.username, userValidated.pricelist, userValidated.client, userValidated.seller);
-        res.json(userValidated);
+        const token = jwt.sign({ id: userValidated.id, username: userValidated.username }, SECRET_JWT_KEY, {
+            expiresIn: "1h"
+        })
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            secure: true,///process.env.NODE_ENV == 'production',
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60
+        });
+        
+        res.send({userValidated, token});
     }else{
         res.status(404).json({message: 'Error al iniciar sesion'});
     }

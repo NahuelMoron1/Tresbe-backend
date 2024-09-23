@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUsers = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUsersBySeller = exports.login = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
+exports.deleteUsers = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUsersBySeller = exports.login = exports.temporalLogin = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
 const Users_1 = __importDefault(require("../models/mysql/Users"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const User_1 = require("../models/User");
 const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.params;
     if (email != config_1.admin) {
@@ -84,14 +86,35 @@ const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getUserByEmail = getUserByEmail;
+const temporalLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    const userAux = yield loginCheck(email, password);
+    let userValidated = new User_1.User('', '', '', '', false, '', '');
+    if (userAux != null) {
+        userValidated = userAux;
+        res.json(userValidated);
+    }
+    else {
+        res.status(404).json({ message: 'Error al iniciar sesion' });
+    }
+});
+exports.temporalLogin = temporalLogin;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     const userAux = yield loginCheck(email, password);
     let userValidated = new User_1.User('', '', '', '', false, '', '');
     if (userAux != null) {
         userValidated = userAux;
-        ///let publicUser: PublicUser = new PublicUser(userValidated.id, userValidated.email, userValidated.username, userValidated.pricelist, userValidated.client, userValidated.seller);
-        res.json(userValidated);
+        const token = jsonwebtoken_1.default.sign({ id: userValidated.id, username: userValidated.username }, config_2.SECRET_JWT_KEY, {
+            expiresIn: "1h"
+        });
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            secure: true, ///process.env.NODE_ENV == 'production',
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60
+        });
+        res.send({ userValidated, token });
     }
     else {
         res.status(404).json({ message: 'Error al iniciar sesion' });

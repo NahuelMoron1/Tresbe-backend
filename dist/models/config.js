@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAINTENANCE = exports.DB_PORT = exports.admin = exports.DB_NAME = exports.DB_PASSWORD = exports.DB_USER = exports.DB_HOST = exports.PORT = void 0;
+exports.MAINTENANCE = exports.DB_PORT = exports.SECRET_JWT_KEY = exports.admin = exports.DB_NAME = exports.DB_PASSWORD = exports.DB_USER = exports.DB_HOST = exports.PORT = void 0;
 exports.PORT = process.env.PORT || '3000';
 /*export let DB_HOST: string = '';
 if(process.env.DB_HOST){
@@ -25,10 +25,11 @@ if(process.env.DB_PORT){
     DB_PORT = parseInt(process.env.DB_PORT);
 }*/
 exports.DB_HOST = process.env.DB_HOST || '127.0.0.1';
-exports.DB_USER = process.env.DB_USER || 'moronnahuu';
+exports.DB_USER = process.env.DB_USER || 'nahuel';
 exports.DB_PASSWORD = process.env.DB_PASSWORD || 'Cacerola2611@';
-exports.DB_NAME = process.env.DB_NAME || 'tresbe';
+exports.DB_NAME = process.env.DB_NAME || 'testing';
 exports.admin = process.env.ADMIN || 'nahuelarielmoron1@gmail.com';
+exports.SECRET_JWT_KEY = "contrasena-larga-segura-con-hashes";
 exports.DB_PORT = 3306;
 if (process.env.DB_PORT) {
     exports.DB_PORT = parseInt(process.env.DB_PORT) || 3306;
