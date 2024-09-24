@@ -10,10 +10,10 @@ const tokenExist = (req, res) => {
     const { cookieName } = req.params;
     const token = req.cookies[cookieName];
     if (!token) {
-        return false;
+        res.json(false);
     }
     else {
-        return true;
+        res.json(true);
     }
 };
 exports.tokenExist = tokenExist;
@@ -26,12 +26,17 @@ const getToken = (req, res) => {
     else {
         try {
             const data = jsonwebtoken_1.default.verify(token, config_1.SECRET_JWT_KEY);
-            res.json(data);
+            if (typeof data === 'object' && data !== null) {
+                const user = data; // Casting si estás seguro que data contiene propiedades de User
+                return res.json(user);
+            }
+            else {
+                return res.status(401).send("Acceso denegado");
+            }
         }
         catch (error) {
             return res.status(401).send("acceso denegado");
         }
-        return true;
     }
 };
 exports.getToken = getToken;
