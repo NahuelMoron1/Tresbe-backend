@@ -32,4 +32,3 @@ export const getToken = (req: Request, res: Response) => {
         }
     }
 }
-

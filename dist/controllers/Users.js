@@ -109,6 +109,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             expiresIn: "1h"
         });
         res.cookie('access_token', access_token, {
+            path: '/',
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
             sameSite: 'none',
@@ -119,8 +120,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 expiresIn: "1h"
             });
             res.cookie('admin_token', admin_token, {
+                path: '/',
                 httpOnly: true,
-                secure: true, ///process.env.NODE_ENV == 'production',
+                secure: true, ///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
                 sameSite: 'none',
                 maxAge: 1000 * 60 * 60
             });
@@ -135,21 +137,29 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.login = login;
-const logout = (req, res) => {
-    // Elimina la cookie 'access_token'
-    res.clearCookie('access_token', {
-        httpOnly: true,
-        secure: true, // Asegúrate de que coincida con cómo se configuró la cookie
-        sameSite: 'none'
-    });
-    // También puedes eliminar cualquier otra cookie, como 'admin_token'
-    res.clearCookie('admin_token', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none'
-    });
-    res.status(200).json({ message: 'Sesión cerrada correctamente' });
-};
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.cookies.access_token;
+    if (token) {
+        const admin = req.cookies.admin_token;
+        res.cookie('access_token', '', {
+            path: '/',
+            httpOnly: true,
+            secure: true, ///process.env.NODE_ENV == 'production',
+            sameSite: 'none',
+            maxAge: 0
+        });
+        if (admin) {
+            res.cookie('admin_token', '', {
+                path: '/',
+                httpOnly: true,
+                secure: true, ///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
+                sameSite: 'none',
+                maxAge: 0
+            });
+        }
+        res.send('finish');
+    }
+});
 exports.logout = logout;
 function loginCheck(email, password) {
     return __awaiter(this, void 0, void 0, function* () {

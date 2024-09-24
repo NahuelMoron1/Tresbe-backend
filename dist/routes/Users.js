@@ -12,6 +12,7 @@ router.get('/username/:username/:email', Users_1.getUserByName);
 router.delete('/:id', Users_1.deleteUser);
 router.delete('/', Users_1.deleteUsers);
 router.post('/', Users_1.postUser);
+router.post('/validate/logout/user/logged', Users_1.logout);
 router.post('/login', Users_1.login);
 router.post('/tempLogin', Users_1.temporalLogin);
 router.post('/email', Email_1.sendEmail);
