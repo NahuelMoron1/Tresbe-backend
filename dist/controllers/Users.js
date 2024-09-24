@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUsers = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUsersBySeller = exports.login = exports.temporalLogin = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
+exports.deleteUsers = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUsersBySeller = exports.logout = exports.login = exports.temporalLogin = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
 const Users_1 = __importDefault(require("../models/mysql/Users"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const User_1 = require("../models/User");
@@ -105,22 +105,52 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userValidated = new User_1.User('', '', '', '', false, '', '');
     if (userAux != null) {
         userValidated = userAux;
-        const token = jsonwebtoken_1.default.sign({ id: userValidated.id, username: userValidated.username }, config_2.SECRET_JWT_KEY, {
+        const access_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client }, config_2.SECRET_JWT_KEY, {
             expiresIn: "1h"
         });
-        res.cookie('access_token', token, {
+        res.cookie('access_token', access_token, {
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
             sameSite: 'none',
             maxAge: 1000 * 60 * 60
         });
-        res.send({ userValidated, token });
+        if (userValidated.email == config_1.admin) {
+            const admin_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, username: userValidated.username, priceList: userValidated.priceList, client: userValidated.client }, config_2.SECRET_JWT_KEY, {
+                expiresIn: "1h"
+            });
+            res.cookie('admin_token', admin_token, {
+                httpOnly: true,
+                secure: true, ///process.env.NODE_ENV == 'production',
+                sameSite: 'none',
+                maxAge: 1000 * 60 * 60
+            });
+            res.send({ userValidated, access_token, admin_token });
+        }
+        else {
+            res.send({ userValidated, access_token });
+        }
     }
     else {
         res.status(404).json({ message: 'Error al iniciar sesion' });
     }
 });
 exports.login = login;
+const logout = (req, res) => {
+    // Elimina la cookie 'access_token'
+    res.clearCookie('access_token', {
+        httpOnly: true,
+        secure: true, // Asegúrate de que coincida con cómo se configuró la cookie
+        sameSite: 'none'
+    });
+    // También puedes eliminar cualquier otra cookie, como 'admin_token'
+    res.clearCookie('admin_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    });
+    res.status(200).json({ message: 'Sesión cerrada correctamente' });
+};
+exports.logout = logout;
 function loginCheck(email, password) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = yield Users_1.default.scope('withAll').findOne({ where: { email: email } });

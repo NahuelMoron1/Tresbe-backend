@@ -82,21 +82,53 @@ export const login = async (req: Request, res: Response) => {
     let userValidated: User = new User('','','','',false,'','');
     if(userAux != null){
         userValidated = userAux;
-        const token = jwt.sign({ id: userValidated.id, username: userValidated.username }, SECRET_JWT_KEY, {
+        const access_token = jwt.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client }, SECRET_JWT_KEY, {
             expiresIn: "1h"
-        })
-        res.cookie('access_token', token, {
+        });
+
+        res.cookie('access_token', access_token, {
             httpOnly: true,
             secure: true,///process.env.NODE_ENV == 'production',
             sameSite: 'none',
             maxAge: 1000 * 60 * 60
         });
-        
-        res.send({userValidated, token});
+
+        if(userValidated.email == admin){
+            const admin_token = jwt.sign({ id: userValidated.id, email: userValidated.email, username: userValidated.username, priceList: userValidated.priceList, client: userValidated.client}, SECRET_JWT_KEY, {
+                expiresIn: "1h"
+            });
+            res.cookie('admin_token', admin_token, {
+                httpOnly: true,
+                secure: true,///process.env.NODE_ENV == 'production',
+                sameSite: 'none',
+                maxAge: 1000 * 60 * 60
+            });
+            res.send({userValidated, access_token, admin_token});
+        }else{
+            res.send({userValidated, access_token});
+        }
     }else{
         res.status(404).json({message: 'Error al iniciar sesion'});
     }
 }
+
+export const logout = (req: Request, res: Response) => {
+    // Elimina la cookie 'access_token'
+    res.clearCookie('access_token', {
+        httpOnly: true,
+        secure: true,  // Asegúrate de que coincida con cómo se configuró la cookie
+        sameSite: 'none'
+    });
+
+    // También puedes eliminar cualquier otra cookie, como 'admin_token'
+    res.clearCookie('admin_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none'
+    });
+
+    res.status(200).json({ message: 'Sesión cerrada correctamente' });
+};
 
 async function loginCheck(email: string, password: string){
     const user = await Users.scope('withAll').findOne({where: {email: email}});

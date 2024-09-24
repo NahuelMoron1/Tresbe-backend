@@ -44,7 +44,8 @@ exports.getProductOptions = getProductOptions;
 const getProductOptionsByTwo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { productID } = req.params;
     const { optionName } = req.params;
-    const OptionAux = yield Options_1.default.findOne({ where: { name: optionName } && { productID: productID } });
+    const optionValid = decodeURIComponent(optionName);
+    const OptionAux = yield Options_1.default.findOne({ where: { name: optionValid } && { productID: productID } });
     if (OptionAux) {
         res.json(OptionAux);
     }
