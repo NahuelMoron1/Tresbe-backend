@@ -87,6 +87,7 @@ export const login = async (req: Request, res: Response) => {
         });
 
         res.cookie('access_token', access_token, {
+            path: '/',
             httpOnly: true,
             secure: true,///process.env.NODE_ENV == 'production',
             sameSite: 'none',
@@ -98,8 +99,9 @@ export const login = async (req: Request, res: Response) => {
                 expiresIn: "1h"
             });
             res.cookie('admin_token', admin_token, {
+                path: '/',
                 httpOnly: true,
-                secure: true,///process.env.NODE_ENV == 'production',
+                secure: true,///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
                 sameSite: 'none',
                 maxAge: 1000 * 60 * 60
             });
@@ -112,23 +114,30 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
-export const logout = (req: Request, res: Response) => {
-    // Elimina la cookie 'access_token'
-    res.clearCookie('access_token', {
-        httpOnly: true,
-        secure: true,  // Asegúrate de que coincida con cómo se configuró la cookie
-        sameSite: 'none'
-    });
-
-    // También puedes eliminar cualquier otra cookie, como 'admin_token'
-    res.clearCookie('admin_token', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none'
-    });
-
-    res.status(200).json({ message: 'Sesión cerrada correctamente' });
-};
+export const logout = async (req: Request, res: Response) => {
+    const token = req.cookies.access_token;
+    
+    if(token){
+        const admin = req.cookies.admin_token;
+        res.cookie('access_token', '', {
+            path: '/',
+            httpOnly: true,
+            secure: true,///process.env.NODE_ENV == 'production',
+            sameSite: 'none',
+            maxAge: 0
+        });
+        if(admin){
+            res.cookie('admin_token', '', {
+                path: '/',
+                httpOnly: true,
+                secure: true,///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
+                sameSite: 'none',
+                maxAge: 0
+            });
+        }
+        res.send('finish');
+    }
+}
 
 async function loginCheck(email: string, password: string){
     const user = await Users.scope('withAll').findOne({where: {email: email}});

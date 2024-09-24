@@ -82,11 +82,11 @@ class Server {
     middlewares() {
         const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com'];
         this.app.use(express_1.default.json());
+        this.app.use((0, cookie_parser_1.default)());
         this.app.use((0, cors_1.default)({
             origin: allowedOrigins,
             credentials: true
         }));
-        this.app.use((0, cookie_parser_1.default)());
     }
     dbConnect() {
         return __awaiter(this, void 0, void 0, function* () {
