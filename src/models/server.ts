@@ -71,12 +71,13 @@ class Server {
 
     }
     middlewares() {
-        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com'];
+        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com', 'https://api.somostresbe.com'];
         this.app.use(express.json());
         this.app.use(cookieParser());
         this.app.use(cors({
             origin: allowedOrigins,
-            credentials: true
+            methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+            credentials: true,
         }));
     }
     async dbConnect() {

@@ -80,12 +80,13 @@ class Server {
         });
     }
     middlewares() {
-        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com'];
+        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com', 'https://api.somostresbe.com'];
         this.app.use(express_1.default.json());
         this.app.use((0, cookie_parser_1.default)());
         this.app.use((0, cors_1.default)({
             origin: allowedOrigins,
-            credentials: true
+            methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+            credentials: true,
         }));
     }
     dbConnect() {
