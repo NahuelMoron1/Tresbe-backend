@@ -15,6 +15,9 @@ const Options = connection_1.default.define('Options', {
     },
     name: {
         type: sequelize_1.DataTypes.STRING,
+    },
+    stock: {
+        type: sequelize_1.DataTypes.INTEGER,
     }
 }, { timestamps: false });
 exports.default = Options;

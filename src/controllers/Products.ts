@@ -3,7 +3,7 @@ import Products from "../models/mysql/Products";
 import { Op, QueryTypes } from "sequelize";
 import sequelize from "../db/connection";
 
-export const getProducts = async (req: Request, res: Response) => {  
+export const getProducts = async (req: Request, res: Response) => {
     const { page } = req.params;
     const pageNumb = parseInt(page);
     const pageSize = 12; //Cantidad de elementos por pagina
@@ -30,26 +30,26 @@ export const countPages = async (req: Request, res: Response) => {
     const { type } = req.params;
     const pageSize = 12; //Cantidad de elementos por pagina
     let totalProducts = 0;
-    if(type == 'all'){
+    if (type == 'all') {
         totalProducts = await Products.count(); // Obtener el total de productos
-    }else{
-        if(type == 'brand'){
-            totalProducts = await Products.count({where: {brand: brand}}); // Obtener el total de productos
-        }else{
-            totalProducts = await Products.count({where: {category: brand}}); // Obtener el total de productos
+    } else {
+        if (type == 'brand') {
+            totalProducts = await Products.count({ where: { brand: brand } }); // Obtener el total de productos
+        } else {
+            totalProducts = await Products.count({ where: { category: brand } }); // Obtener el total de productos
         }
     }
     const totalPages = (totalProducts / pageSize);
-        res.json(Math.ceil(totalPages));
+    res.json(Math.ceil(totalPages));
 }
 
 export const getProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const productAux = await Products.findByPk(id);    
-    if(productAux){
+    const productAux = await Products.findByPk(id);
+    if (productAux) {
         res.json(productAux);
     } else {
-        res.status(404).json({message: 'Error, Product not found'})
+        res.status(404).json({ message: 'Error, Product not found' })
     }
 }
 export const getProductsByBrands = async (req: Request, res: Response) => {
@@ -64,7 +64,7 @@ export const getProductsByBrands = async (req: Request, res: Response) => {
     const offset = (validPageNumb - 1) * pageSize;
 
     const productsAux = await Products.findAll({
-        where: {brand: brand},
+        where: { brand: brand },
         limit: pageSize,
         offset: offset,
         order: [
@@ -72,27 +72,27 @@ export const getProductsByBrands = async (req: Request, res: Response) => {
             ['stock', 'ASC'], // Ordenar por `category` en orden ascendente
         ],
     });
-    if(productsAux){
+    if (productsAux) {
         res.json(productsAux);
     } else {
-        res.status(404).json({message: 'Error, product not found'})
+        res.status(404).json({ message: 'Error, product not found' })
     }
 }
 
 export const getRandomProducts = async (req: Request, res: Response) => {
     const products = await Products.sequelize?.query(
-      `SELECT * FROM Products WHERE brand = 'Tel' ORDER BY RAND() LIMIT 3`,
-      {
-        type: QueryTypes.SELECT
-      }
+        `SELECT * FROM Products WHERE brand = 'Tel' ORDER BY RAND() LIMIT 3`,
+        {
+            type: QueryTypes.SELECT
+        }
     );
 
-    if(products){
+    if (products) {
         res.json(products);
     } else {
-        res.status(404).json({message: 'Error, product not found'})
+        res.status(404).json({ message: 'Error, product not found' })
     }
-  };
+};
 
 export const getProductsByCategory = async (req: Request, res: Response) => {
     const { category } = req.params;
@@ -104,9 +104,9 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
     // Si la página solicitada supera el número máximo de páginas, ajustarla a la última página
     const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
     const offset = (validPageNumb - 1) * pageSize;
-    
+
     const productsAux = await Products.findAll({
-        where: {category: category},
+        where: { category: category },
         limit: pageSize,
         offset: offset,
         order: [
@@ -114,10 +114,10 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
             ['stock', 'ASC']       // Ordenar por `name` en orden ascendente
         ],
     });
-    if(productsAux){
+    if (productsAux) {
         res.json(productsAux);
     } else {
-        res.status(404).json({message: 'Error, product not found'})
+        res.status(404).json({ message: 'Error, product not found' })
     }
 }
 
@@ -130,12 +130,12 @@ export const getProductsBySearch = async (req: Request, res: Response) => {
             name: { [Op.like]: `%${word}%` }
         }))
     };
-    
+
     // Agregar la condición de brand si no es 'all'
     if (value !== '' && value != 'all') {
-        if(type == 'brand'){
+        if (type == 'brand') {
             whereConditions[Op.and].push({ brand: value });
-        }else if(type == 'category'){
+        } else if (type == 'category') {
             whereConditions[Op.and].push({ category: value });
         }
     }
@@ -148,46 +148,64 @@ export const getProductsBySearch = async (req: Request, res: Response) => {
             ['name', 'ASC']       // Ordenar por `name` en orden ascendente
         ],
     });
-    
-    if(productsAux){
+
+    if (productsAux) {
         res.json(productsAux);
     } else {
-        res.status(404).json({message: 'Error, product not found'})
+        res.status(404).json({ message: 'Error, product not found' })
     }
 }
 
 export const deleteProduct = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const productAux = await Products.findByPk(`${id}`);
-    if(productAux){
-        await productAux.destroy();
-        res.json({message: 'Product successfully deleted'});
-    } else{
-        res.status(404).json({message: 'Error, product not found'})
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        const { id } = req.params;
+        const productAux = await Products.findByPk(`${id}`);
+        if (productAux) {
+            await productAux.destroy();
+            res.json({ message: 'Product successfully deleted' });
+        } else {
+            res.status(404).json({ message: 'Error, product not found' })
+        }
+    } else {
+        res.send('Permiso denegado');
     }
 }
-export const postProduct = async(req: Request, res: Response) => {
-    const body = req.body;
-    await Products.create(body);
-    res.json({
-        message: 'Product successfully created',
-    })
+export const postProduct = async (req: Request, res: Response) => {
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        const body = req.body;
+        await Products.create(body);
+        res.json({
+            message: 'Product successfully created',
+        })
+    } else {
+        res.send('Permiso denegado');
+    }
 }
-export const updateProduct = async(req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response) => {
     const body = req.body;
     const { id } = req.params;
 
-    
+
     const productAux = await Products.findByPk(id);
-    if(productAux){
+    if (productAux) {
         productAux.update(body);
         res.json({
             message: 'Product updated with success',
         })
     } else {
-        res.status(404).json({message: 'Error, product not found'})
+        res.status(404).json({ message: 'Error, product not found' })
     }
 }
 export const deleteProducts = async (req: Request, res: Response) => {
-    await Products.destroy({truncate: true});
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+    await Products.destroy({ truncate: true });
+    }else{
+        res.send('Permiso denegado');
+    }
 }

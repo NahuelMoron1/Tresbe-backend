@@ -6,7 +6,7 @@ class PublicUser {
         this.id = id;
         this.email = email;
         this.username = username;
-        this.pricelist = pricelist;
+        this.priceList = pricelist;
         this.client = client;
     }
 }
