@@ -31,23 +31,37 @@ const getCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getCategory = getCategory;
 const deleteCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const CategoryAux = yield Categories_1.default.findByPk(`${id}`);
-    if (CategoryAux) {
-        yield Categories_1.default.destroy();
-        res.json({ message: 'Category successfully deleted' });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        const { id } = req.params;
+        const CategoryAux = yield Categories_1.default.findByPk(`${id}`);
+        if (CategoryAux) {
+            yield Categories_1.default.destroy();
+            res.json({ message: 'Category successfully deleted' });
+        }
+        else {
+            res.status(404).json({ message: 'Error, Category not found' });
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Category not found' });
+        res.send('Permiso denegado');
     }
 });
 exports.deleteCategory = deleteCategory;
 const postCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield Categories_1.default.create(body);
-    res.json({
-        message: 'Category successfully created',
-    });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        const body = req.body;
+        yield Categories_1.default.create(body);
+        res.json({
+            message: 'Category successfully created',
+        });
+    }
+    else {
+        res.send('Permiso denegado');
+    }
 });
 exports.postCategory = postCategory;
 const updateCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -66,6 +80,13 @@ const updateCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.updateCategory = updateCategory;
 const deleteCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Categories_1.default.destroy({ truncate: true });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        yield Categories_1.default.destroy({ truncate: true });
+    }
+    else {
+        res.send('Permiso denegado');
+    }
 });
 exports.deleteCategories = deleteCategories;

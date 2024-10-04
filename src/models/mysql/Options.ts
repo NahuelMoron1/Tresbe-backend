@@ -11,6 +11,9 @@ const Options = db.define('Options', {
     },
     name: {
         type: DataTypes.STRING,
+    },
+    stock: {
+        type: DataTypes.INTEGER,
     }
 }, {timestamps: false})
 

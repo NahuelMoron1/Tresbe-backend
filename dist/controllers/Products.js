@@ -170,23 +170,37 @@ const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 exports.getProductsBySearch = getProductsBySearch;
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const productAux = yield Products_1.default.findByPk(`${id}`);
-    if (productAux) {
-        yield productAux.destroy();
-        res.json({ message: 'Product successfully deleted' });
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        const { id } = req.params;
+        const productAux = yield Products_1.default.findByPk(`${id}`);
+        if (productAux) {
+            yield productAux.destroy();
+            res.json({ message: 'Product successfully deleted' });
+        }
+        else {
+            res.status(404).json({ message: 'Error, product not found' });
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, product not found' });
+        res.send('Permiso denegado');
     }
 });
 exports.deleteProduct = deleteProduct;
 const postProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield Products_1.default.create(body);
-    res.json({
-        message: 'Product successfully created',
-    });
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        const body = req.body;
+        yield Products_1.default.create(body);
+        res.json({
+            message: 'Product successfully created',
+        });
+    }
+    else {
+        res.send('Permiso denegado');
+    }
 });
 exports.postProduct = postProduct;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -205,6 +219,13 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.updateProduct = updateProduct;
 const deleteProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Products_1.default.destroy({ truncate: true });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        yield Products_1.default.destroy({ truncate: true });
+    }
+    else {
+        res.send('Permiso denegado');
+    }
 });
 exports.deleteProducts = deleteProducts;

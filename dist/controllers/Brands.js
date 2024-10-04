@@ -39,23 +39,37 @@ const getBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getBrand = getBrand;
 const deleteBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const BrandAux = yield Brands_1.default.findByPk(`${id}`);
-    if (BrandAux) {
-        yield BrandAux.destroy();
-        res.json({ message: 'Brand successfully deleted' });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        const { id } = req.params;
+        const BrandAux = yield Brands_1.default.findByPk(`${id}`);
+        if (BrandAux) {
+            yield BrandAux.destroy();
+            res.json({ message: 'Brand successfully deleted' });
+        }
+        else {
+            res.status(404).json({ message: 'Error, Brand not found' });
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Brand not found' });
+        res.send('Permiso denegado');
     }
 });
 exports.deleteBrand = deleteBrand;
 const postBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield Brands_1.default.create(body);
-    res.json({
-        message: 'Brand successfully created',
-    });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        const body = req.body;
+        yield Brands_1.default.create(body);
+        res.json({
+            message: 'Brand successfully created',
+        });
+    }
+    else {
+        res.send('Permiso denegado');
+    }
 });
 exports.postBrands = postBrands;
 const updateBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -74,6 +88,13 @@ const updateBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.updateBrand = updateBrand;
 const deleteBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Brands_1.default.destroy({ truncate: true });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        yield Brands_1.default.destroy({ truncate: true });
+    }
+    else {
+        res.send('Permiso denegado');
+    }
 });
 exports.deleteBrands = deleteBrands;

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Brands from "../models/mysql/Brands";
 import sequelize from "../db/connection";
 
-export const getBrands = async (req: Request, res: Response) => {    
+export const getBrands = async (req: Request, res: Response) => {
     const listBrands = await Brands.findAll({
         order: [
             // Primero ponemos las marcas cuyo nombre es 'Tel'
@@ -16,43 +16,61 @@ export const getBrands = async (req: Request, res: Response) => {
 
 export const getBrand = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const BrandAux = await Brands.findByPk(id);    
-    if(BrandAux){
+    const BrandAux = await Brands.findByPk(id);
+    if (BrandAux) {
         res.json(BrandAux);
     } else {
-        res.status(404).json({message: 'Error, Brand not found'})
+        res.status(404).json({ message: 'Error, Brand not found' })
     }
 }
 export const deleteBrand = async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const BrandAux = await Brands.findByPk(`${id}`);
-    if(BrandAux){
-        await BrandAux.destroy();
-        res.json({message: 'Brand successfully deleted'});
-    } else{
-        res.status(404).json({message: 'Error, Brand not found'})
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        const { id } = req.params;
+        const BrandAux = await Brands.findByPk(`${id}`);
+        if (BrandAux) {
+            await BrandAux.destroy();
+            res.json({ message: 'Brand successfully deleted' });
+        } else {
+            res.status(404).json({ message: 'Error, Brand not found' })
+        }
+    }else{
+        res.send('Permiso denegado');
     }
 }
-export const postBrands = async(req: Request, res: Response) => {
-    const body = req.body;
-    await Brands.create(body);
-    res.json({
-        message: 'Brand successfully created',
-    })
+export const postBrands = async (req: Request, res: Response) => {
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        const body = req.body;
+        await Brands.create(body);
+        res.json({
+            message: 'Brand successfully created',
+        })
+    }else{
+        res.send('Permiso denegado');
+    }
 }
-export const updateBrand = async(req: Request, res: Response) => {
+export const updateBrand = async (req: Request, res: Response) => {
     const body = req.body;
     const { id } = req.params;
     const BrandsAux = await Brands.findByPk(id);
-    if(BrandsAux){
+    if (BrandsAux) {
         BrandsAux.update(body);
         res.json({
             message: 'Brand updated with success',
         })
     } else {
-        res.status(404).json({message: 'Error, Brand not found'})
+        res.status(404).json({ message: 'Error, Brand not found' })
     }
 }
 export const deleteBrands = async (req: Request, res: Response) => {
-    await Brands.destroy({truncate: true});
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        await Brands.destroy({ truncate: true });
+    }else{
+        res.send('Permiso denegado');
+    }
 }
