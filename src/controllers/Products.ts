@@ -188,8 +188,6 @@ export const postProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
     const body = req.body;
     const { id } = req.params;
-
-
     const productAux = await Products.findByPk(id);
     if (productAux) {
         productAux.update(body);

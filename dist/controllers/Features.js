@@ -14,9 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteFeatures = exports.updateFeature = exports.postFeature = exports.deleteFeature = exports.getProductFeatures = exports.getFeature = exports.getFeatures = void 0;
 const Features_1 = __importDefault(require("../models/mysql/Features"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listFeatures = yield Features_1.default.findAll();
-    res.json(listFeatures);
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const listFeatures = yield Features_1.default.findAll();
+            res.json(listFeatures);
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.getFeatures = getFeatures;
 const getFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -42,23 +57,47 @@ const getProductFeatures = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.getProductFeatures = getProductFeatures;
 const deleteFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const FeatureAux = yield Features_1.default.findByPk(`${id}`);
-    if (FeatureAux) {
-        yield FeatureAux.destroy();
-        res.json({ message: 'Feature successfully deleted' });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const FeatureAux = yield Features_1.default.findByPk(`${id}`);
+            if (FeatureAux) {
+                yield FeatureAux.destroy();
+                res.json({ message: 'Feature successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Feature not found' });
+            }
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Feature not found' });
+        res.send('Ruta protegida');
     }
 });
 exports.deleteFeature = deleteFeature;
 const postFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield Features_1.default.create(body);
-    res.json({
-        message: 'Feature successfully created',
-    });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const body = req.body;
+            yield Features_1.default.create(body);
+            res.json({
+                message: 'Feature successfully created',
+            });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.postFeature = postFeature;
 const updateFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -77,6 +116,33 @@ const updateFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.updateFeature = updateFeature;
 const deleteFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Features_1.default.destroy({ truncate: true });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            yield Features_1.default.destroy({ truncate: true });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.deleteFeatures = deleteFeatures;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+};
