@@ -24,25 +24,30 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
-        const { email } = req.params;
-        if (email != config_1.admin) {
-            const listUsers = yield Users_1.default.findAll();
-            let users = [];
-            if (listUsers) {
-                users = listUsers.map(user => user.toJSON());
+        if (verifyAdmin(tokenAux)) {
+            const { email } = req.params;
+            if (email != config_1.admin) {
+                const listUsers = yield Users_1.default.findAll();
+                let users = [];
+                if (listUsers) {
+                    users = listUsers.map(user => user.toJSON());
+                }
+                res.json(users);
             }
-            res.json(users);
-        }
-        else if (email == config_1.admin) {
-            const listUsers = yield Users_1.default.scope('withAll').findAll();
-            let users = [];
-            if (listUsers) {
-                users = listUsers.map(user => user.toJSON());
+            else if (email == config_1.admin) {
+                const listUsers = yield Users_1.default.scope('withAll').findAll();
+                let users = [];
+                if (listUsers) {
+                    users = listUsers.map(user => user.toJSON());
+                }
+                res.json(users);
             }
-            res.json(users);
+            else {
+                res.status(501).json({ message: "Bad Request for users" });
+            }
         }
         else {
-            res.status(501).json({ message: "Bad Request for users" });
+            res.send('Ruta protegid');
         }
     }
     else {
@@ -107,13 +112,18 @@ const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function*
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
-        const { email } = req.params;
-        const UserAux = yield Users_1.default.scope('withAll').findOne({ where: { email: email } });
-        if (UserAux) {
-            res.json(UserAux);
+        if (verifyAdmin(tokenAux)) {
+            const { email } = req.params;
+            const UserAux = yield Users_1.default.scope('withAll').findOne({ where: { email: email } });
+            if (UserAux) {
+                res.json(UserAux);
+            }
+            else {
+                res.status(404).json({ message: 'Error, User not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, User not found' });
+            res.send('Ruta protegida');
         }
     }
     else {
@@ -138,7 +148,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 1000 * 60 * 60
         });
         res.cookie('refresh_token', refresh_token, {
@@ -146,7 +157,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 1000 * 60 * 60 * 24
         });
         if (userValidated.email == config_1.admin) {
@@ -158,6 +170,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 httpOnly: true,
                 secure: true, ///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
                 sameSite: 'none',
+                domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
                 maxAge: 1000 * 60 * 60
             });
             res.send({ userValidated, access_token, admin_token });
@@ -180,7 +193,8 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 0
         });
         res.cookie('access_token', '', {
@@ -188,7 +202,8 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 0
         });
         if (admin) {
@@ -196,6 +211,7 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 path: '/',
                 httpOnly: true,
                 secure: true, ///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
+                domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
                 sameSite: 'none',
                 maxAge: 0
             });
@@ -227,13 +243,18 @@ const getUsersBySeller = (req, res) => __awaiter(void 0, void 0, void 0, functio
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
-        const { seller } = req.params;
-        const UserAux = yield Users_1.default.findAll({ where: { seller: seller } });
-        if (UserAux) {
-            res.json(UserAux);
+        if (verifyAdmin(tokenAux)) {
+            const { seller } = req.params;
+            const UserAux = yield Users_1.default.findAll({ where: { seller: seller } });
+            if (UserAux) {
+                res.json(UserAux);
+            }
+            else {
+                res.status(404).json({ message: 'Error, User not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, User not found' });
+            res.send('Ruta protegida');
         }
     }
     else {
@@ -245,13 +266,18 @@ const getUserByName = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     let access = req.cookies['access_token'];
     let tokenAux = req.cookies['admin_token'];
     if (access && tokenAux) {
-        const { username } = req.params;
-        const UserAux = yield Users_1.default.findOne({ where: { username: username } });
-        if (UserAux) {
-            res.json(UserAux);
+        if (verifyAdmin(tokenAux)) {
+            const { username } = req.params;
+            const UserAux = yield Users_1.default.findOne({ where: { username: username } });
+            if (UserAux) {
+                res.json(UserAux);
+            }
+            else {
+                res.status(404).json({ message: 'Error, User not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, User not found' });
+            res.send('Ruta protegida');
         }
     }
     else {
@@ -263,14 +289,19 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
-        const { id } = req.params;
-        const UserAux = yield Users_1.default.findByPk(`${id}`);
-        if (UserAux) {
-            yield UserAux.destroy();
-            res.json({ message: 'User successfully deleted' });
+        if (verifyAdmin(tokenAux)) {
+            const { id } = req.params;
+            const UserAux = yield Users_1.default.findByPk(`${id}`);
+            if (UserAux) {
+                yield UserAux.destroy();
+                res.json({ message: 'User successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, User not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, User not found' });
+            res.send('Ruta protegida');
         }
     }
     else {
@@ -282,21 +313,26 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
-        let { id, email, username, priceList, client, seller, password } = req.body;
-        let hashedPassword = yield bcrypt_1.default.hash(password, 10);
-        const user = {
-            id,
-            email,
-            username,
-            priceList,
-            client,
-            seller,
-            password: hashedPassword // Guardar la contraseña hasheada
-        };
-        yield Users_1.default.create(user);
-        res.json({
-            message: `User successfully created with hashed password: ${user}`,
-        });
+        if (verifyAdmin(tokenAux)) {
+            let { id, email, username, priceList, client, seller, password } = req.body;
+            let hashedPassword = yield bcrypt_1.default.hash(password, 10);
+            const user = {
+                id,
+                email,
+                username,
+                priceList,
+                client,
+                seller,
+                password: hashedPassword // Guardar la contraseña hasheada
+            };
+            yield Users_1.default.create(user);
+            res.json({
+                message: `User successfully created with hashed password: ${user}`,
+            });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('Ruta protegida');
@@ -320,6 +356,21 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateUser = updateUser;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+};
 const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
@@ -347,7 +398,12 @@ const deleteUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
-        yield Users_1.default.destroy({ truncate: true });
+        if (verifyAdmin(tokenAux)) {
+            yield Users_1.default.destroy({ truncate: true });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('Ruta protegida');

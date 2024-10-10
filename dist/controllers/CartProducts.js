@@ -14,9 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCartProducts = exports.updateCartProduct = exports.postCartProduct = exports.deleteCartProduct = exports.getCartProductsByOrder = exports.getCartProduct = exports.getCartProducts = void 0;
 const CartProduct_1 = __importDefault(require("../models/mysql/CartProduct"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getCartProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listProducts = yield CartProduct_1.default.findAll();
-    res.json(listProducts);
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const listProducts = yield CartProduct_1.default.findAll();
+            res.json(listProducts);
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.getCartProducts = getCartProducts;
 const getCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -42,23 +57,38 @@ const getCartProductsByOrder = (req, res) => __awaiter(void 0, void 0, void 0, f
 });
 exports.getCartProductsByOrder = getCartProductsByOrder;
 const deleteCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const productAux = yield CartProduct_1.default.findByPk(`${id}`);
-    if (productAux) {
-        yield productAux.destroy();
-        res.json({ message: 'CartProduct successfully deleted' });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const productAux = yield CartProduct_1.default.findByPk(`${id}`);
+            if (productAux) {
+                yield productAux.destroy();
+                res.json({ message: 'CartProduct successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Cartproduct not found' });
+            }
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Cartproduct not found' });
+        res.send('Ruta protegida');
     }
 });
 exports.deleteCartProduct = deleteCartProduct;
 const postCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield CartProduct_1.default.create(body);
-    res.json({
-        message: 'CartProduct successfully created',
-    });
+    const access_token = req.cookies.access_token;
+    if (access_token) {
+        const body = req.body;
+        yield CartProduct_1.default.create(body);
+        res.json({
+            message: 'CartProduct successfully created',
+        });
+    }
 });
 exports.postCartProduct = postCartProduct;
 const updateCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -77,6 +107,33 @@ const updateCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.updateCartProduct = updateCartProduct;
 const deleteCartProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield CartProduct_1.default.destroy({ truncate: true });
+    const access_token = req.cookies.access_token;
+    const admin_token = req.cookies.admin_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            yield CartProduct_1.default.destroy({ truncate: true });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.deleteCartProducts = deleteCartProducts;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+};

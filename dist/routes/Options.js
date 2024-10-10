@@ -12,5 +12,5 @@ router.delete('/:id', Options_1.deleteOption);
 router.delete('/deleteProduct/:id', Options_1.deleteOptionByProduct);
 router.delete('/:', Options_1.deleteOptions);
 router.post('/', Options_1.postOption);
-router.patch('/:id', Options_1.updateOption);
+router.patch('/:oldID', Options_1.updateOption);
 exports.default = router;

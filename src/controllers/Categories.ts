@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
 import Categories from "../models/mysql/Categories";
+import { admin } from "../models/config";
+import jwt, { verify } from "jsonwebtoken";
+import { SECRET_JWT_KEY } from "../models/config";
+import { PublicUser } from "../models/PublicUser";
 
 export const getCategories = async (req: Request, res: Response) => {
     const listFeatures = await Categories.findAll();
@@ -19,13 +23,17 @@ export const deleteCategory = async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const { id } = req.params;
-        const CategoryAux = await Categories.findByPk(`${id}`);
-        if (CategoryAux) {
-            await Categories.destroy();
-            res.json({ message: 'Category successfully deleted' });
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const CategoryAux = await Categories.findByPk(`${id}`);
+            if (CategoryAux) {
+                await Categories.destroy();
+                res.json({ message: 'Category successfully deleted' });
+            } else {
+                res.status(404).json({ message: 'Error, Category not found' })
+            }
         } else {
-            res.status(404).json({ message: 'Error, Category not found' })
+            res.send('Ruta protegida');
         }
     } else {
         res.send('Permiso denegado');
@@ -35,11 +43,15 @@ export const postCategory = async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const body = req.body;
-        await Categories.create(body);
-        res.json({
-            message: 'Category successfully created',
-        })
+        if (verifyAdmin(admin_token)) {
+            const body = req.body;
+            await Categories.create(body);
+            res.json({
+                message: 'Category successfully created',
+            })
+        } else {
+            res.send('Ruta protegida');
+        }
     } else {
         res.send('Permiso denegado');
     }
@@ -61,8 +73,25 @@ export const deleteCategories = async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        await Categories.destroy({ truncate: true });
+        if (verifyAdmin(admin_token)) {
+            await Categories.destroy({ truncate: true });
+        } else {
+            res.send('Ruta protegida');
+        }
     } else {
         res.send('Permiso denegado');
+    }
+}
+const verifyAdmin = (adminToken: any) => {
+    const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux: PublicUser = dataAdmin as PublicUser;
+        if (userAux.email == admin) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
     }
 }

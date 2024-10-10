@@ -14,6 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategories = exports.updateCategory = exports.postCategory = exports.deleteCategory = exports.getCategory = exports.getCategories = void 0;
 const Categories_1 = __importDefault(require("../models/mysql/Categories"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listFeatures = yield Categories_1.default.findAll();
     res.json(listFeatures);
@@ -34,14 +37,19 @@ const deleteCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const { id } = req.params;
-        const CategoryAux = yield Categories_1.default.findByPk(`${id}`);
-        if (CategoryAux) {
-            yield Categories_1.default.destroy();
-            res.json({ message: 'Category successfully deleted' });
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const CategoryAux = yield Categories_1.default.findByPk(`${id}`);
+            if (CategoryAux) {
+                yield Categories_1.default.destroy();
+                res.json({ message: 'Category successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Category not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, Category not found' });
+            res.send('Ruta protegida');
         }
     }
     else {
@@ -53,11 +61,16 @@ const postCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const body = req.body;
-        yield Categories_1.default.create(body);
-        res.json({
-            message: 'Category successfully created',
-        });
+        if (verifyAdmin(admin_token)) {
+            const body = req.body;
+            yield Categories_1.default.create(body);
+            res.json({
+                message: 'Category successfully created',
+            });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('Permiso denegado');
@@ -83,10 +96,30 @@ const deleteCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        yield Categories_1.default.destroy({ truncate: true });
+        if (verifyAdmin(admin_token)) {
+            yield Categories_1.default.destroy({ truncate: true });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('Permiso denegado');
     }
 });
 exports.deleteCategories = deleteCategories;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+};

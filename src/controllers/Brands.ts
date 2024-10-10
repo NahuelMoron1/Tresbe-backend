@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import Brands from "../models/mysql/Brands";
 import sequelize from "../db/connection";
+import { admin } from "../models/config";
+import jwt, { verify } from "jsonwebtoken";
+import { SECRET_JWT_KEY } from "../models/config";
+import { PublicUser } from "../models/PublicUser";
 
 export const getBrands = async (req: Request, res: Response) => {
     const listBrands = await Brands.findAll({
@@ -27,15 +31,19 @@ export const deleteBrand = async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const { id } = req.params;
-        const BrandAux = await Brands.findByPk(`${id}`);
-        if (BrandAux) {
-            await BrandAux.destroy();
-            res.json({ message: 'Brand successfully deleted' });
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const BrandAux = await Brands.findByPk(`${id}`);
+            if (BrandAux) {
+                await BrandAux.destroy();
+                res.json({ message: 'Brand successfully deleted' });
+            } else {
+                res.status(404).json({ message: 'Error, Brand not found' })
+            }
         } else {
-            res.status(404).json({ message: 'Error, Brand not found' })
+            res.send('Ruta protegida');
         }
-    }else{
+    } else {
         res.send('Permiso denegado');
     }
 }
@@ -43,12 +51,16 @@ export const postBrands = async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const body = req.body;
-        await Brands.create(body);
-        res.json({
-            message: 'Brand successfully created',
-        })
-    }else{
+        if (verifyAdmin(admin_token)) {
+            const body = req.body;
+            await Brands.create(body);
+            res.json({
+                message: 'Brand successfully created',
+            })
+        } else {
+            res.send('Ruta protegida');
+        }
+    } else {
         res.send('Permiso denegado');
     }
 }
@@ -69,8 +81,23 @@ export const deleteBrands = async (req: Request, res: Response) => {
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        await Brands.destroy({ truncate: true });
-    }else{
+        if (verifyAdmin(admin_token)) {
+            await Brands.destroy({ truncate: true });
+        }
+    } else {
         res.send('Permiso denegado');
+    }
+}
+const verifyAdmin = (adminToken: any) => {
+    const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux: PublicUser = dataAdmin as PublicUser;
+        if (userAux.email == admin) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
     }
 }

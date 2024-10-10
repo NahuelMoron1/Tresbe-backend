@@ -14,9 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteOptions = exports.updateOption = exports.postOption = exports.deleteOption = exports.deleteOptionByProduct = exports.getProductOptionsByName = exports.getProductOptionsByTwo = exports.getProductOptions = exports.getOption = exports.getOptions = void 0;
 const Options_1 = __importDefault(require("../models/mysql/Options"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getOptions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listOptions = yield Options_1.default.findAll();
-    res.json(listOptions);
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            const listOptions = yield Options_1.default.findAll();
+            res.json(listOptions);
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.getOptions = getOptions;
 const getOption = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -66,52 +81,88 @@ const getProductOptionsByName = (req, res) => __awaiter(void 0, void 0, void 0, 
 });
 exports.getProductOptionsByName = getProductOptionsByName;
 const deleteOptionByProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const OptionAux = yield Options_1.default.findAll({ where: { productID: id } });
-    if (OptionAux) {
-        if (OptionAux.length > 0) {
-            if (OptionAux.length < 2) {
-                yield OptionAux[0].destroy();
-            }
-            else {
-                for (let i = 0; i < OptionAux.length; i++) {
-                    yield OptionAux[i].destroy();
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            const { id } = req.params;
+            const OptionAux = yield Options_1.default.findAll({ where: { productID: id } });
+            if (OptionAux) {
+                if (OptionAux.length > 0) {
+                    if (OptionAux.length < 2) {
+                        yield OptionAux[0].destroy();
+                    }
+                    else {
+                        for (let i = 0; i < OptionAux.length; i++) {
+                            yield OptionAux[i].destroy();
+                        }
+                    }
+                    res.json({ message: 'Options successfully deleted' });
                 }
             }
-            res.json({ message: 'Options successfully deleted' });
+            else {
+                res.status(404).json({ message: 'Error, Options not found' });
+            }
+        }
+        else {
+            res.send('Ruta protegida');
         }
     }
     else {
-        res.status(404).json({ message: 'Error, Options not found' });
+        res.send('Ruta protegida');
     }
 });
 exports.deleteOptionByProduct = deleteOptionByProduct;
 const deleteOption = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const OptionAux = yield Options_1.default.findByPk(`${id}`);
-    if (OptionAux) {
-        yield OptionAux.destroy();
-        res.json({ message: 'Option successfully deleted' });
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            const { id } = req.params;
+            const OptionAux = yield Options_1.default.findByPk(`${id}`);
+            if (OptionAux) {
+                yield OptionAux.destroy();
+                res.json({ message: 'Option successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Option not found' });
+            }
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Option not found' });
+        res.send('Ruta protegida');
     }
 });
 exports.deleteOption = deleteOption;
 const postOption = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    yield Options_1.default.create(body);
-    res.json({
-        message: 'Option successfully created',
-    });
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            const body = req.body;
+            yield Options_1.default.create(body);
+            res.json({
+                message: 'Option successfully created',
+            });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.postOption = postOption;
 const updateOption = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
-    const { id } = req.params;
-    const OptionAux = yield Options_1.default.findByPk(id);
+    const { oldID } = req.params;
+    const OptionAux = yield Options_1.default.findByPk(oldID);
     if (OptionAux) {
-        OptionAux.update(body);
+        let varaux = yield Options_1.default.update({ id: body.id, name: body.name, productID: body.productID, stock: body.stock }, { where: { id: oldID } });
         res.json({
             message: 'Option updated',
         });
@@ -122,6 +173,33 @@ const updateOption = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.updateOption = updateOption;
 const deleteOptions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Options_1.default.destroy({ truncate: true });
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            yield Options_1.default.destroy({ truncate: true });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.deleteOptions = deleteOptions;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+};

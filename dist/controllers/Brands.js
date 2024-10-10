@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBrands = exports.updateBrand = exports.postBrands = exports.deleteBrand = exports.getBrand = exports.getBrands = void 0;
 const Brands_1 = __importDefault(require("../models/mysql/Brands"));
 const connection_1 = __importDefault(require("../db/connection"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const listBrands = yield Brands_1.default.findAll({
         order: [
@@ -42,14 +45,19 @@ const deleteBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const { id } = req.params;
-        const BrandAux = yield Brands_1.default.findByPk(`${id}`);
-        if (BrandAux) {
-            yield BrandAux.destroy();
-            res.json({ message: 'Brand successfully deleted' });
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const BrandAux = yield Brands_1.default.findByPk(`${id}`);
+            if (BrandAux) {
+                yield BrandAux.destroy();
+                res.json({ message: 'Brand successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Brand not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, Brand not found' });
+            res.send('Ruta protegida');
         }
     }
     else {
@@ -61,11 +69,16 @@ const postBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        const body = req.body;
-        yield Brands_1.default.create(body);
-        res.json({
-            message: 'Brand successfully created',
-        });
+        if (verifyAdmin(admin_token)) {
+            const body = req.body;
+            yield Brands_1.default.create(body);
+            res.json({
+                message: 'Brand successfully created',
+            });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('Permiso denegado');
@@ -91,10 +104,27 @@ const deleteBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const access_token = req.cookies.access_token;
     const admin_token = req.cookies.admin_token;
     if (access_token && admin_token) {
-        yield Brands_1.default.destroy({ truncate: true });
+        if (verifyAdmin(admin_token)) {
+            yield Brands_1.default.destroy({ truncate: true });
+        }
     }
     else {
         res.send('Permiso denegado');
     }
 });
 exports.deleteBrands = deleteBrands;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+};

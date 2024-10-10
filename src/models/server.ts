@@ -71,7 +71,7 @@ class Server {
 
     }
     middlewares() {
-        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com', 'https://api.somostresbe.com'];
+        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com', 'https://api.somostresbe.com', 'https://www.tresbedistribuidora.com', 'https://api.tresbedistribuidora.com', 'https://tresbedistribuidora.com'];
         this.app.use(express.json());
         this.app.use(cookieParser());
         this.app.use(cors({

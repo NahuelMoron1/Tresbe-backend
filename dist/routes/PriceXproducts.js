@@ -10,4 +10,5 @@ router.delete('/:id', PriceXproducts_1.deletePriceXproduct);
 router.delete('/:', PriceXproducts_1.deletePriceXproducts);
 router.post('/', PriceXproducts_1.postPriceXproduct);
 router.patch('/:id', PriceXproducts_1.updatePriceXproduct);
+router.patch('/update/option/:id', PriceXproducts_1.updateOptionID);
 exports.default = router;

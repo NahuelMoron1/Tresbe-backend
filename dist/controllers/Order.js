@@ -22,21 +22,111 @@ const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
     if (access_token && admin_token) {
-        const listOrders = yield Orders_1.default.findAll();
-        res.json(listOrders);
+        if (verifyAdmin(admin_token)) {
+            const listOrders = yield Orders_1.default.findAll();
+            res.json(listOrders);
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('No se puede acceder a las ordenes de compra de la empresa');
     }
 });
 exports.getOrders = getOrders;
-const getOrdersByUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+/*export const getOrdersByUser = async (req: Request, res: Response) => {
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
     if (access_token) {
         const { userid } = req.params;
-        if (admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const ordersAux = await Order.findAll({ where: { userID: userid } });
+            if (ordersAux) {
+                res.json(ordersAux);
+            } else {
+                res.status(404).json({ message: 'Error, orders not found' })
+            }
+        } else {
+            const data = jwt.verify(access_token, SECRET_JWT_KEY);
+            if (typeof data === 'object' && data !== null) {
+                const user: PublicUser = data as PublicUser; // Casting si estás seguro que data contiene propiedades de User
+                if (user.id == userid) {
+                    const ordersAux = await Order.findAll({ where: { userID: userid } });
+                    if (ordersAux) {
+                        res.json(ordersAux);
+                    } else {
+                        res.status(404).json({ message: 'Error, orders not found' })
+                    }
+                } else {
+                    res.send('No podes acceder a ordenes de compra de otros usuarios');
+                }
+            }
+        }
+    } else {
+        res.send('No podes acceder a las ordenes de compra si no estas logueado')
+    }
+}*/
+const getOrdersByUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const admin_token = req.cookies.admin_token;
+        const access_token = req.cookies.access_token;
+        // Verifica si el token de acceso está presente
+        if (!access_token) {
+            return res.status(403).json({ message: 'No puedes acceder a las órdenes de compra si no estás logueado.' });
+        }
+        const { userid } = req.params;
+        // Si es admin, puede acceder a cualquier orden
+        if (verifyAdmin(admin_token)) {
             const ordersAux = yield Orders_1.default.findAll({ where: { userID: userid } });
+            if (ordersAux.length > 0) {
+                return res.json(ordersAux);
+            }
+            else {
+                return res.status(404).json({ message: 'Error, órdenes no encontradas.' });
+            }
+        }
+        else {
+            // Verificación para usuarios normales
+            try {
+                const data = jsonwebtoken_1.default.verify(access_token, config_1.SECRET_JWT_KEY);
+                if (typeof data === 'object' && data !== null) {
+                    const user = data; // Casting si estás seguro que data contiene propiedades de User
+                    // Solo puede acceder a sus propias órdenes
+                    if (user.id == userid) {
+                        const ordersAux = yield Orders_1.default.findAll({ where: { userID: userid } });
+                        if (ordersAux.length > 0) {
+                            return res.json(ordersAux);
+                        }
+                        else {
+                            return res.status(404).json({ message: 'Error, órdenes no encontradas.' });
+                        }
+                    }
+                    else {
+                        return res.status(403).json({ message: 'No puedes acceder a las órdenes de compra de otros usuarios.' });
+                    }
+                }
+                else {
+                    return res.status(403).json({ message: 'Token de acceso inválido.' });
+                }
+            }
+            catch (error) {
+                return res.status(401).json({ message: 'Token de acceso inválido o expirado.' });
+            }
+        }
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Error al procesar la solicitud.', error });
+    }
+});
+exports.getOrdersByUser = getOrdersByUser;
+const getOrdersNotPayed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const { userid } = req.params;
+            const ordersAux = yield Orders_1.default.findAll({ where: { userId: userid } && { payed: false } });
             if (ordersAux) {
                 res.json(ordersAux);
             }
@@ -45,41 +135,11 @@ const getOrdersByUser = (req, res) => __awaiter(void 0, void 0, void 0, function
             }
         }
         else {
-            const data = jsonwebtoken_1.default.verify(access_token, config_1.SECRET_JWT_KEY);
-            if (typeof data === 'object' && data !== null) {
-                const user = data; // Casting si estás seguro que data contiene propiedades de User
-                if (user.id == userid) {
-                    const ordersAux = yield Orders_1.default.findAll({ where: { userID: userid } });
-                    if (ordersAux) {
-                        res.json(ordersAux);
-                    }
-                    else {
-                        res.status(404).json({ message: 'Error, orders not found' });
-                    }
-                }
-                else {
-                    res.send('No podes acceder a ordenes de compra de otros usuarios');
-                }
-            }
+            res.send('Ruta protegida');
         }
     }
     else {
-        res.send('No podes acceder a las ordenes de compra si no estas logueado');
-    }
-});
-exports.getOrdersByUser = getOrdersByUser;
-const getOrdersNotPayed = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const admin_token = req.cookies.admin_token;
-    const access_token = req.cookies.access_token;
-    if (access_token && admin_token) {
-        const { userid } = req.params;
-        const ordersAux = yield Orders_1.default.findAll({ where: { userId: userid } && { payed: false } });
-        if (ordersAux) {
-            res.json(ordersAux);
-        }
-        else {
-            res.status(404).json({ message: 'Error, orders not found' });
-        }
+        res.send('Ruta protegida');
     }
 });
 exports.getOrdersNotPayed = getOrdersNotPayed;
@@ -87,13 +147,21 @@ const getOrdersAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function*
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
     if (access_token && admin_token) {
-        const ordersAux = yield Orders_1.default.findAll({ where: { attended: 0 } });
-        if (ordersAux) {
-            res.json(ordersAux);
+        if (verifyAdmin(admin_token)) {
+            const ordersAux = yield Orders_1.default.findAll({ where: { attended: 0 } });
+            if (ordersAux) {
+                res.json(ordersAux);
+            }
+            else {
+                res.status(404).json({ message: 'Error, orders not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, orders not found' });
+            res.send('Ruta protegida');
         }
+    }
+    else {
+        res.send('Ruta protegida');
     }
 });
 exports.getOrdersAdmin = getOrdersAdmin;
@@ -104,7 +172,7 @@ const searchOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const { idcode } = req.params;
         const { userid } = req.params;
         let access = false;
-        if (admin_token) {
+        if (verifyAdmin(admin_token)) {
             access = true;
         }
         else {
@@ -138,6 +206,9 @@ const searchOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             res.send('No se puede acceder a los pedidos de otros usuarios');
         }
     }
+    else {
+        res.send('Ruta protegida');
+    }
 });
 exports.searchOrders = searchOrders;
 const getOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -155,15 +226,23 @@ const deleteOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
     if (access_token && admin_token) {
-        const { id } = req.params;
-        const OrderAux = yield Orders_1.default.findByPk(`${id}`);
-        if (OrderAux) {
-            yield OrderAux.destroy();
-            res.json({ message: 'Order successfully deleted' });
+        if (verifyAdmin(admin_token)) {
+            const { id } = req.params;
+            const OrderAux = yield Orders_1.default.findByPk(`${id}`);
+            if (OrderAux) {
+                yield OrderAux.destroy();
+                res.json({ message: 'Order successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Order not found' });
+            }
         }
         else {
-            res.status(404).json({ message: 'Error, Order not found' });
+            res.send('Ruta protegida');
         }
+    }
+    else {
+        res.send('Ruta protegida');
     }
 });
 exports.deleteOrder = deleteOrder;
@@ -226,10 +305,32 @@ const deleteOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
     if (access_token && admin_token) {
-        yield Orders_1.default.destroy({ truncate: true });
+        if (verifyAdmin(admin_token)) {
+            yield Orders_1.default.destroy({ truncate: true });
+        }
+        else {
+            res.send('Ruta protegida');
+        }
     }
     else {
         res.send('Acceso denegado');
     }
 });
 exports.deleteOrders = deleteOrders;
+const verifyAdmin = (adminToken) => {
+    if (adminToken) {
+        const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
+        if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+            const userAux = dataAdmin;
+            if (userAux.email == config_1.admin) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+};

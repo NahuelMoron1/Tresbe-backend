@@ -80,7 +80,7 @@ class Server {
         });
     }
     middlewares() {
-        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com', 'https://api.somostresbe.com'];
+        const allowedOrigins = ['http://localhost:4200', 'https://www.somostresbe.com', 'https://api.somostresbe.com', 'https://www.tresbedistribuidora.com', 'https://api.tresbedistribuidora.com', 'https://tresbedistribuidora.com'];
         this.app.use(express_1.default.json());
         this.app.use((0, cookie_parser_1.default)());
         this.app.use((0, cors_1.default)({

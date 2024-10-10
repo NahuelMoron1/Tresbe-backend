@@ -14,43 +14,96 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUsersdata = exports.updateUserdata = exports.postUserdata = exports.deleteUserdata = exports.getUserdataByUserID = exports.getUserdata = exports.getUsersdata = void 0;
 const Userdata_1 = __importDefault(require("../models/mysql/Userdata"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getUsersdata = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const listUsersdata = yield Userdata_1.default.findAll();
-    res.json(listUsersdata);
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            const listUsersdata = yield Userdata_1.default.findAll();
+            res.json(listUsersdata);
+        }
+    }
 });
 exports.getUsersdata = getUsersdata;
-const getUserdata = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const UserdataAux = yield Userdata_1.default.findByPk(id);
-    if (UserdataAux) {
-        res.json(UserdataAux);
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        if (userAux.email == config_1.admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Userdata not found' });
+        return false;
+    }
+};
+const getUserdata = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let access = req.cookies.access_token;
+    if (access) {
+        const { id } = req.params;
+        const UserdataAux = yield Userdata_1.default.findByPk(id);
+        if (UserdataAux) {
+            res.json(UserdataAux);
+        }
+        else {
+            res.status(404).json({ message: 'Error, Userdata not found' });
+        }
+    }
+    else {
+        res.send('Ruta protegida');
     }
 });
 exports.getUserdata = getUserdata;
 const getUserdataByUserID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userid } = req.params;
-    console.log("USER ID: " + userid);
-    const UserAux = yield Userdata_1.default.findOne({ where: { userID: userid } });
-    if (UserAux) {
-        res.json(UserAux);
+    let access = req.cookies.access_token;
+    if (access) {
+        const { userid } = req.params;
+        const data = jsonwebtoken_1.default.verify(access, config_2.SECRET_JWT_KEY);
+        if (typeof data === 'object' && data !== null) {
+            const user = data;
+            if (user.id == userid || user.email == config_1.admin) {
+                const UserAux = yield Userdata_1.default.findOne({ where: { userID: userid } });
+                if (UserAux) {
+                    res.json(UserAux);
+                }
+                else {
+                    res.status(404).json({ message: 'Error, Userdata not found' });
+                }
+            }
+            else {
+                res.send('Ruta protegida, tu ID no coincide con el id que buscas');
+            }
+        }
+        else {
+            res.send('Ruta protegida, la cookie no tiene cuerpo');
+        }
     }
     else {
-        res.status(404).json({ message: 'Error, Userdata not found' });
+        res.send('Ruta protegida, no accediste');
     }
 });
 exports.getUserdataByUserID = getUserdataByUserID;
 const deleteUserdata = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const UserdataAux = yield Userdata_1.default.findByPk(`${id}`);
-    if (UserdataAux) {
-        yield UserdataAux.destroy();
-        res.json({ message: 'Userdata successfully deleted' });
-    }
-    else {
-        res.status(404).json({ message: 'Error, Userdata not found' });
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            const { id } = req.params;
+            const UserdataAux = yield Userdata_1.default.findByPk(`${id}`);
+            if (UserdataAux) {
+                yield UserdataAux.destroy();
+                res.json({ message: 'Userdata successfully deleted' });
+            }
+            else {
+                res.status(404).json({ message: 'Error, Userdata not found' });
+            }
+        }
     }
 });
 exports.deleteUserdata = deleteUserdata;
@@ -78,6 +131,12 @@ const updateUserdata = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.updateUserdata = updateUserdata;
 const deleteUsersdata = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Userdata_1.default.destroy({ truncate: true });
+    let tokenAux = req.cookies.admin_token;
+    let access = req.cookies.access_token;
+    if (access && tokenAux) {
+        if (verifyAdmin(tokenAux)) {
+            yield Userdata_1.default.destroy({ truncate: true });
+        }
+    }
 });
 exports.deleteUsersdata = deleteUsersdata;
