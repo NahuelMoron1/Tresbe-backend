@@ -122,8 +122,8 @@ export const login = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 1000 * 60 * 60
         });
 
@@ -132,8 +132,8 @@ export const login = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 1000 * 60 * 60 * 24
         });
 
@@ -146,7 +146,8 @@ export const login = async (req: Request, res: Response) => {
                 httpOnly: true,
                 secure: true,///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
                 sameSite: 'none',
-                domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
                 maxAge: 1000 * 60 * 60
             });
             res.send({ userValidated, access_token, admin_token });
@@ -168,8 +169,8 @@ export const logout = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 0
         });
 
@@ -178,8 +179,8 @@ export const logout = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,///process.env.NODE_ENV == 'production',
             sameSite: 'none',
-            ///domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 0
         });
 
@@ -188,7 +189,8 @@ export const logout = async (req: Request, res: Response) => {
                 path: '/',
                 httpOnly: true,
                 secure: true,///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
-                domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
                 sameSite: 'none',
                 maxAge: 0
             });

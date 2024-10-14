@@ -19,7 +19,16 @@ export const tokenExist = (req: Request, res: Response) => {
             if (!token) {
                 return res.json(false); // Usamos return para evitar que siga ejecutando código
             } else {
-                return res.json(true); // Usamos return para evitar que siga ejecutando código
+                if (typeof token === 'object' && token !== null) {
+                    const userAux: PublicUser = token as PublicUser;
+                    if (userAux.email == admin) {
+                        return res.json(true); // Usamos return para evitar que siga ejecutando código
+                    } else {
+                        return res.json(false);
+                    }
+                } else {
+                    res.json(false);
+                }
             }
         }
 
@@ -37,7 +46,8 @@ export const tokenExist = (req: Request, res: Response) => {
                     path: '/',
                     httpOnly: true,
                     secure: true,
-                    domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                    domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                    ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
                     sameSite: 'none',
                     maxAge: 1000 * 60 * 60
                 });
@@ -57,7 +67,8 @@ export const tokenExist = (req: Request, res: Response) => {
                                 path: '/',
                                 httpOnly: true,
                                 secure: true,
-                                domain: '.tresbedistribuidora.com',
+                                domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                                ///domain: '.tresbedistribuidora.com',
                                 sameSite: 'none',
                                 maxAge: 1000 * 60 * 60
                             });
