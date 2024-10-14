@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-/*import multer from 'multer'
-import sharp from 'sharp';*/
 const Products_1 = __importDefault(require("../routes/Products"));
 const Features_1 = __importDefault(require("../routes/Features"));
 const Categories_1 = __importDefault(require("../routes/Categories"));
@@ -37,11 +35,6 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const config_1 = require("./config");
 const config_2 = require("./config");
 class Server {
-    /*private storage = multer.diskStorage({
-        destination:(req, file, cb) => {
-            cb(null, './uploads')
-        }
-    })*/
     constructor() {
         this.app = (0, express_1.default)();
         this.port = config_1.PORT || '3001';

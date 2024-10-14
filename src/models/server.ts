@@ -1,7 +1,5 @@
 import express, { Application, Request, response, Response } from 'express';
 import cors from 'cors';
-/*import multer from 'multer'
-import sharp from 'sharp';*/
 import productRouter from '../routes/Products';
 import featuresRouter from '../routes/Features';
 import categoriesRouter from '../routes/Categories';
@@ -27,11 +25,6 @@ import { MAINTENANCE } from './config';
 class Server {
     private app: Application;
     private port: string;
-    /*private storage = multer.diskStorage({
-        destination:(req, file, cb) => {
-            cb(null, './uploads')
-        }
-    })*/
     constructor() {
         this.app = express();
         this.port = PORT || '3001';
