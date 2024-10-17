@@ -24,8 +24,9 @@ const tokenExist = (req, res) => {
                 return res.json(false); // Usamos return para evitar que siga ejecutando código
             }
             else {
-                if (typeof token === 'object' && token !== null) {
-                    const userAux = token;
+                const adminToken = jsonwebtoken_1.default.verify(token, config_1.SECRET_JWT_KEY);
+                if (typeof adminToken === 'object' && token !== null) {
+                    const userAux = adminToken;
                     if (userAux.email == config_1.admin) {
                         return res.json(true); // Usamos return para evitar que siga ejecutando código
                     }
@@ -38,47 +39,49 @@ const tokenExist = (req, res) => {
                 }
             }
         }
-        try {
-            const data = jsonwebtoken_1.default.verify(refreshToken, config_1.SECRET_JWT_KEY);
-            if (typeof data === 'object' && data !== null) {
-                const user = data; // Casting si estás seguro que data contiene propiedades de User                
-                const access_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
-                res.cookie('access_token', access_token, {
-                    path: '/',
-                    httpOnly: true,
-                    secure: true,
-                    domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                    ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                    sameSite: 'none',
-                    maxAge: 1000 * 60 * 60
-                });
-                const adminToken = req.cookies.admin_token;
-                if (adminToken) {
-                    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
-                    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
-                        const userAux = dataAdmin;
-                        if (userAux.email == config_1.admin && user.email == config_1.admin) {
-                            const admin_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
-                            res.cookie('admin_token', admin_token, {
-                                path: '/',
-                                httpOnly: true,
-                                secure: true,
-                                domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                                ///domain: '.tresbedistribuidora.com',
-                                sameSite: 'none',
-                                maxAge: 1000 * 60 * 60
-                            });
+        else {
+            try {
+                const data = jsonwebtoken_1.default.verify(refreshToken, config_1.SECRET_JWT_KEY);
+                if (typeof data === 'object' && data !== null) {
+                    const user = data; // Casting si estás seguro que data contiene propiedades de User                
+                    const access_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
+                    res.cookie('access_token', access_token, {
+                        path: '/',
+                        httpOnly: true,
+                        secure: true,
+                        domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                        ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                        sameSite: 'none',
+                        maxAge: 1000 * 60 * 60
+                    });
+                    const adminToken = req.cookies.admin_token;
+                    if (adminToken) {
+                        const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
+                        if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+                            const userAux = dataAdmin;
+                            if (userAux.email == config_1.admin && user.email == config_1.admin) {
+                                const admin_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
+                                res.cookie('admin_token', admin_token, {
+                                    path: '/',
+                                    httpOnly: true,
+                                    secure: true,
+                                    domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                                    ///domain: '.tresbedistribuidora.com',
+                                    sameSite: 'none',
+                                    maxAge: 1000 * 60 * 60
+                                });
+                            }
                         }
                     }
+                    return res.json(true); // Usamos return para evitar que siga ejecutando código
                 }
-                return res.json(true); // Usamos return para evitar que siga ejecutando código
+                else {
+                    return res.status(401).send("Acceso denegado"); // Enviamos respuesta y detenemos la ejecución
+                }
             }
-            else {
-                return res.status(401).send("Acceso denegado"); // Enviamos respuesta y detenemos la ejecución
+            catch (error) {
+                return res.status(401).send("acceso denegado"); // Enviamos respuesta en caso de error y detenemos la ejecución
             }
-        }
-        catch (error) {
-            return res.status(401).send("acceso denegado"); // Enviamos respuesta en caso de error y detenemos la ejecución
         }
     }
 };
