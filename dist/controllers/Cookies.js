@@ -27,12 +27,17 @@ const tokenExist = (req, res) => {
                 const adminToken = jsonwebtoken_1.default.verify(token, config_1.SECRET_JWT_KEY);
                 if (typeof adminToken === 'object' && token !== null) {
                     const userAux = adminToken;
-                    if (userAux.email == config_1.admin) {
-                        return res.json(true); // Usamos return para evitar que siga ejecutando código
+                    let access = false;
+                    let i = 0;
+                    while (i < config_1.admin.length && !access) {
+                        if (userAux.email === config_1.admin[i]) {
+                            access = true;
+                        }
+                        else {
+                            i++;
+                        }
                     }
-                    else {
-                        return res.json(false);
-                    }
+                    return res.json(access);
                 }
                 else {
                     res.json(false);
@@ -44,7 +49,7 @@ const tokenExist = (req, res) => {
                 const data = jsonwebtoken_1.default.verify(refreshToken, config_1.SECRET_JWT_KEY);
                 if (typeof data === 'object' && data !== null) {
                     const user = data; // Casting si estás seguro que data contiene propiedades de User                
-                    const access_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
+                    const access_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
                     res.cookie('access_token', access_token, {
                         path: '/',
                         httpOnly: true,
@@ -59,8 +64,28 @@ const tokenExist = (req, res) => {
                         const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
                         if (typeof dataAdmin === 'object' && dataAdmin !== null) {
                             const userAux = dataAdmin;
-                            if (userAux.email == config_1.admin && user.email == config_1.admin) {
-                                const admin_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
+                            let access = false;
+                            let i = 0;
+                            while (i < config_1.admin.length && !access) {
+                                if (user.email === config_1.admin[i]) {
+                                    access = true;
+                                }
+                                else {
+                                    i++;
+                                }
+                            }
+                            let access2 = false;
+                            let m = 0;
+                            while (m < config_1.admin.length && !access2) {
+                                if (userAux.email === config_1.admin[m]) {
+                                    access2 = true;
+                                }
+                                else {
+                                    m++;
+                                }
+                            }
+                            if (access2 && access) {
+                                const admin_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
                                 res.cookie('admin_token', admin_token, {
                                     path: '/',
                                     httpOnly: true,

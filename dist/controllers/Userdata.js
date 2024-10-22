@@ -32,7 +32,17 @@ const verifyAdmin = (adminToken) => {
     const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
     if (typeof dataAdmin === 'object' && dataAdmin !== null) {
         const userAux = dataAdmin;
-        if (userAux.email == config_1.admin) {
+        let access = false;
+        let i = 0;
+        while (i < config_1.admin.length && !access) {
+            if (userAux.email === config_1.admin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        if (access) {
             return true;
         }
         else {
@@ -67,7 +77,17 @@ const getUserdataByUserID = (req, res) => __awaiter(void 0, void 0, void 0, func
         const data = jsonwebtoken_1.default.verify(access, config_2.SECRET_JWT_KEY);
         if (typeof data === 'object' && data !== null) {
             const user = data;
-            if (user.id == userid || user.email == config_1.admin) {
+            let access = false;
+            let i = 0;
+            while (i < config_1.admin.length && !access) {
+                if (user.email === config_1.admin[i]) {
+                    access = true;
+                }
+                else {
+                    i++;
+                }
+            }
+            if (user.id == userid || access) {
                 const UserAux = yield Userdata_1.default.findOne({ where: { userID: userid } });
                 if (UserAux) {
                     res.json(UserAux);

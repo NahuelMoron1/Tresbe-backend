@@ -9,6 +9,7 @@ router.get('/admin/attended', Order_1.getOrdersAdmin);
 router.get('/search/code/:idcode', Order_1.searchOrders);
 router.get('/search/code/user/:idcode/:userid', Order_1.searchOrders);
 router.get('/user/:userid', Order_1.getOrdersByUser);
+router.get('/seller/:sellerName', Order_1.getOrdersBySeller);
 router.get('/:id', Order_1.getOrder);
 router.delete('/:id', Order_1.deleteOrder);
 router.delete('/:', Order_1.deleteOrders);

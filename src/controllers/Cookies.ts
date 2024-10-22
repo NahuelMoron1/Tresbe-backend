@@ -22,11 +22,16 @@ export const tokenExist = (req: Request, res: Response) => {
                 const adminToken = jwt.verify(token, SECRET_JWT_KEY);
                 if (typeof adminToken === 'object' && token !== null) {
                     const userAux: PublicUser = adminToken as PublicUser;
-                    if (userAux.email == admin) {
-                        return res.json(true); // Usamos return para evitar que siga ejecutando código
-                    } else {
-                        return res.json(false);
+                    let access = false;
+                    let i = 0;
+                    while (i < admin.length && !access) {
+                        if (userAux.email === admin[i]) {
+                            access = true;
+                        } else {
+                            i++;
+                        }
                     }
+                    return res.json(access);
                 } else {
                     res.json(false);
                 }
@@ -38,7 +43,7 @@ export const tokenExist = (req: Request, res: Response) => {
                 if (typeof data === 'object' && data !== null) {
                     const user: PublicUser = data as PublicUser; // Casting si estás seguro que data contiene propiedades de User                
                     const access_token = jwt.sign(
-                        { id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client },
+                        { id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller },
                         SECRET_JWT_KEY,
                         { expiresIn: "1h" }
                     );
@@ -58,9 +63,27 @@ export const tokenExist = (req: Request, res: Response) => {
                         const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
                         if (typeof dataAdmin === 'object' && dataAdmin !== null) {
                             const userAux: PublicUser = dataAdmin as PublicUser;
-                            if (userAux.email == admin && user.email == admin) {
+                            let access = false;
+                            let i = 0;
+                            while (i < admin.length && !access) {
+                                if (user.email === admin[i]) {
+                                    access = true;
+                                } else {
+                                    i++;
+                                }
+                            }
+                            let access2 = false;
+                            let m = 0;
+                            while (m < admin.length && !access2) {
+                                if (userAux.email === admin[m]) {
+                                    access2 = true;
+                                } else {
+                                    m++;
+                                }
+                            }
+                            if (access2 && access) {
                                 const admin_token = jwt.sign(
-                                    { id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client },
+                                    { id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller },
                                     SECRET_JWT_KEY,
                                     { expiresIn: "1h" }
                                 );

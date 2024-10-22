@@ -42,6 +42,15 @@ const Order = connection_1.default.define('Orders', {
     },
     username: {
         type: sequelize_1.DataTypes.STRING,
+    },
+    typeOfPayment: {
+        type: sequelize_1.DataTypes.STRING
+    },
+    description: {
+        type: sequelize_1.DataTypes.STRING
+    },
+    seller: {
+        type: sequelize_1.DataTypes.STRING
     }
 }, { timestamps: false });
 exports.default = Order;
