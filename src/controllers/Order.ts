@@ -139,6 +139,26 @@ export const getOrdersAdmin = async (req: Request, res: Response) => {
     }
 }
 
+export const getOrdersBySeller = async (req: Request, res: Response) => {
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const { sellerName } = req.params;
+            const ordersAux = await Order.findAll({ where: { seller: sellerName } });
+            if (ordersAux) {
+                res.json(ordersAux);
+            } else {
+                res.status(404).json({ message: 'Error, orders not found' })
+            }
+        } else {
+            res.send('Ruta protegida');
+        }
+    } else {
+        res.send('Ruta protegida');
+    }
+}
+
 export const searchOrders = async (req: Request, res: Response) => {
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
@@ -283,7 +303,16 @@ const verifyAdmin = (adminToken: any) => {
         const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
         if (typeof dataAdmin === 'object' && dataAdmin !== null) {
             const userAux: PublicUser = dataAdmin as PublicUser;
-            if (userAux.email == admin) {
+            let access = false;
+            let i = 0;
+            while (i < admin.length && !access) {
+                if (userAux.email === admin[i]) {
+                    access = true;
+                } else {
+                    i++;
+                }
+            }
+            if (access) {
                 return true;
             } else {
                 return false;

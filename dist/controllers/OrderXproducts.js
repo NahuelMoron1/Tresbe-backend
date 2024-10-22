@@ -38,7 +38,17 @@ const verifyAdmin = (adminToken) => {
     const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
     if (typeof dataAdmin === 'object' && dataAdmin !== null) {
         const userAux = dataAdmin;
-        if (userAux.email == config_1.admin) {
+        let access = false;
+        let i = 0;
+        while (i < config_1.admin.length && !access) {
+            if (userAux.email === config_1.admin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        if (access) {
             return true;
         }
         else {

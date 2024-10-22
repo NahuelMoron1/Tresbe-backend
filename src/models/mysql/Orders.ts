@@ -38,6 +38,15 @@ const Order = db.define('Orders', {
     },
     username: {
         type: DataTypes.STRING,
+    },
+    typeOfPayment: {
+        type: DataTypes.STRING
+    },
+    description: {
+        type: DataTypes.STRING
+    },
+    seller: {
+        type: DataTypes.STRING
     }
 }, {timestamps: false});
 

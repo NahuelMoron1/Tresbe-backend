@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.sendEmail = exports.deleteOrder = exports.getOrder = exports.searchOrders = exports.getOrdersAdmin = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
+exports.deleteOrders = exports.updateOrder = exports.postOrder = exports.sendEmail = exports.deleteOrder = exports.getOrder = exports.searchOrders = exports.getOrdersBySeller = exports.getOrdersAdmin = exports.getOrdersNotPayed = exports.getOrdersByUser = exports.getOrders = void 0;
 const Orders_1 = __importDefault(require("../models/mysql/Orders"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const sequelize_1 = require("sequelize");
@@ -165,6 +165,29 @@ const getOrdersAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getOrdersAdmin = getOrdersAdmin;
+const getOrdersBySeller = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const admin_token = req.cookies.admin_token;
+    const access_token = req.cookies.access_token;
+    if (access_token && admin_token) {
+        if (verifyAdmin(admin_token)) {
+            const { sellerName } = req.params;
+            const ordersAux = yield Orders_1.default.findAll({ where: { seller: sellerName } });
+            if (ordersAux) {
+                res.json(ordersAux);
+            }
+            else {
+                res.status(404).json({ message: 'Error, orders not found' });
+            }
+        }
+        else {
+            res.send('Ruta protegida');
+        }
+    }
+    else {
+        res.send('Ruta protegida');
+    }
+});
+exports.getOrdersBySeller = getOrdersBySeller;
 const searchOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const admin_token = req.cookies.admin_token;
     const access_token = req.cookies.access_token;
@@ -322,7 +345,17 @@ const verifyAdmin = (adminToken) => {
         const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
         if (typeof dataAdmin === 'object' && dataAdmin !== null) {
             const userAux = dataAdmin;
-            if (userAux.email == config_1.admin) {
+            let access = false;
+            let i = 0;
+            while (i < config_1.admin.length && !access) {
+                if (userAux.email === config_1.admin[i]) {
+                    access = true;
+                }
+                else {
+                    i++;
+                }
+            }
+            if (access) {
                 return true;
             }
             else {

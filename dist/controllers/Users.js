@@ -26,7 +26,17 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { email } = req.params;
-            if (email != config_1.admin) {
+            let access = false;
+            let i = 0;
+            while (i < config_1.admin.length && !access) {
+                if (email === config_1.admin[i]) {
+                    access = true;
+                }
+                else {
+                    i++;
+                }
+            }
+            if (!access) {
                 const listUsers = yield Users_1.default.findAll();
                 let users = [];
                 if (listUsers) {
@@ -34,7 +44,7 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 }
                 res.json(users);
             }
-            else if (email == config_1.admin) {
+            else if (access) {
                 const listUsers = yield Users_1.default.scope('withAll').findAll();
                 let users = [];
                 if (listUsers) {
@@ -57,14 +67,24 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUsers = getUsers;
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.access_token;
-    let user = new PublicUser_1.PublicUser('', '', '', '', '');
+    let user = new PublicUser_1.PublicUser('', '', '', '', '', '');
     if (tokenAux) {
         let userAux = yield getToken(tokenAux);
         if (userAux) {
             user = userAux;
         }
         const { id } = req.params;
-        if (user.email === config_1.admin) {
+        let access = false;
+        let i = 0;
+        while (i < config_1.admin.length && !access) {
+            if (user.email === config_1.admin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        if (access) {
             const UserAux = yield Users_1.default.scope('withAll').findByPk(id);
             if (UserAux) {
                 res.json(UserAux);
@@ -92,7 +112,7 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUser = getUser;
 function getToken(tokenAux) {
     return __awaiter(this, void 0, void 0, function* () {
-        let user = new PublicUser_1.PublicUser('', '', '', '', '');
+        let user = new PublicUser_1.PublicUser('', '', '', '', '', '');
         try {
             const data = jsonwebtoken_1.default.verify(tokenAux, config_2.SECRET_JWT_KEY);
             if (typeof data === 'object' && data !== null) {
@@ -137,10 +157,10 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let userValidated = new User_1.User('', '', '', '', false, '', '');
     if (userAux != null) {
         userValidated = userAux;
-        const access_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client }, config_2.SECRET_JWT_KEY, {
+        const access_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client, seller: userValidated.seller }, config_2.SECRET_JWT_KEY, {
             expiresIn: "1h"
         });
-        const refresh_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client }, config_2.SECRET_JWT_KEY, {
+        const refresh_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client, seller: userValidated.seller }, config_2.SECRET_JWT_KEY, {
             expiresIn: "1d"
         });
         res.cookie('access_token', access_token, {
@@ -161,8 +181,18 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
             maxAge: 1000 * 60 * 60 * 24
         });
-        if (userValidated.email == config_1.admin) {
-            const admin_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, username: userValidated.username, priceList: userValidated.priceList, client: userValidated.client }, config_2.SECRET_JWT_KEY, {
+        let access = false;
+        let i = 0;
+        while (i < config_1.admin.length && !access) {
+            if (userValidated.email === config_1.admin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        if (access) {
+            const admin_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, username: userValidated.username, priceList: userValidated.priceList, client: userValidated.client, seller: userValidated.seller }, config_2.SECRET_JWT_KEY, {
                 expiresIn: "1h"
             });
             res.cookie('admin_token', admin_token, {
@@ -362,7 +392,17 @@ const verifyAdmin = (adminToken) => {
     const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
     if (typeof dataAdmin === 'object' && dataAdmin !== null) {
         const userAux = dataAdmin;
-        if (userAux.email == config_1.admin) {
+        let access = false;
+        let i = 0;
+        while (i < config_1.admin.length && !access) {
+            if (userAux.email === config_1.admin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        if (access) {
             return true;
         }
         else {

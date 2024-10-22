@@ -19,7 +19,16 @@ const verifyAdmin = (adminToken: any) => {
     const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
     if (typeof dataAdmin === 'object' && dataAdmin !== null) {
         const userAux: PublicUser = dataAdmin as PublicUser;
-        if (userAux.email == admin) {
+        let access = false;
+        let i = 0;
+        while(i<admin.length && !access){
+            if(userAux.email === admin[i]){
+                access = true;
+            } else {
+                i++;
+            }
+        }
+        if (access) {
             return true;
         } else {
             return false;
@@ -51,7 +60,16 @@ export const getUserdataByUserID = async (req: Request, res: Response) => {
         const data = jwt.verify(access, SECRET_JWT_KEY);
         if (typeof data === 'object' && data !== null) {
             const user: PublicUser = data as PublicUser;
-            if (user.id == userid || user.email == admin) {
+            let access = false;
+        let i = 0;
+        while(i<admin.length && !access){
+            if(user.email === admin[i]){
+                access = true;
+            } else {
+                i++;
+            }
+        }
+            if (user.id == userid || access) {
                 const UserAux = await Userdata.findOne({ where: { userID: userid } });
                 if (UserAux) {
                     res.json(UserAux);

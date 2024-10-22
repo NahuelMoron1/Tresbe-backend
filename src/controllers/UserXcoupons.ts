@@ -84,7 +84,16 @@ const verifyAdmin = (adminToken: any) => {
     const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
     if (typeof dataAdmin === 'object' && dataAdmin !== null) {
         const userAux: PublicUser = dataAdmin as PublicUser;
-        if (userAux.email == admin) {
+        let access = false;
+        let i = 0;
+        while(i<admin.length && !access){
+            if(userAux.email === admin[i]){
+                access = true;
+            } else {
+                i++;
+            }
+        }
+        if (access) {
             return true;
         } else {
             return false;

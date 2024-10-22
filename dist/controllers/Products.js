@@ -16,6 +16,9 @@ exports.deleteProducts = exports.updateProduct = exports.postProduct = exports.d
 const Products_1 = __importDefault(require("../models/mysql/Products"));
 const sequelize_1 = require("sequelize");
 const connection_1 = __importDefault(require("../db/connection"));
+const config_1 = require("../models/config");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_2 = require("../models/config");
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { page } = req.params;
     const pageNumb = parseInt(page);
@@ -229,3 +232,23 @@ const deleteProducts = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.deleteProducts = deleteProducts;
+const verifyAdmin = (adminToken) => {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux = dataAdmin;
+        let access = false;
+        let i = 0;
+        while (i < config_1.admin.length && !access) {
+            if (userAux.email === config_1.admin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        return access;
+    }
+    else {
+        return false;
+    }
+};

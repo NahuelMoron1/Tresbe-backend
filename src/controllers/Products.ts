@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import Products from "../models/mysql/Products";
 import { Op, QueryTypes } from "sequelize";
 import sequelize from "../db/connection";
+import { admin } from "../models/config";
+import jwt, { verify } from "jsonwebtoken";
+import { SECRET_JWT_KEY } from "../models/config";
+import { PublicUser } from "../models/PublicUser";
 
 export const getProducts = async (req: Request, res: Response) => {
     const { page } = req.params;
@@ -205,5 +209,23 @@ export const deleteProducts = async (req: Request, res: Response) => {
     await Products.destroy({ truncate: true });
     }else{
         res.send('Permiso denegado');
+    }
+}
+const verifyAdmin = (adminToken: any) => {
+    const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
+    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+        const userAux: PublicUser = dataAdmin as PublicUser;
+        let access = false;
+        let i = 0;
+        while (i < admin.length && !access) {
+            if (userAux.email === admin[i]) {
+                access = true;
+            } else {
+                i++;
+            }
+        }
+        return access;
+    } else {
+        return false;
     }
 }
