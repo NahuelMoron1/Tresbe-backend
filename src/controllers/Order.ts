@@ -106,7 +106,7 @@ export const getOrdersNotPayed = async (req: Request, res: Response) => {
     if (access_token && admin_token) {
         if (verifyAdmin(admin_token)) {
             const { userid } = req.params;
-            const ordersAux = await Order.findAll({ where: { userId: userid } && { payed: false } });
+            const ordersAux = await Order.findAll({ where: { userId: userid, payed: false } });
             if (ordersAux) {
                 res.json(ordersAux);
             } else {

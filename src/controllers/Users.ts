@@ -66,6 +66,9 @@ export const getUser = async (req: Request, res: Response) => {
         }
         if (access) {
             const UserAux = await Users.scope('withAll').findByPk(id);
+            console.log("USER USER USER");
+            console.log(userAux);
+
             if (UserAux) {
                 res.json(UserAux);
             } else {
@@ -156,8 +159,8 @@ export const login = async (req: Request, res: Response) => {
         });
         let access = false;
         let i = 0;
-        while(i<admin.length && !access){
-            if(userValidated.email === admin[i]){
+        while (i < admin.length && !access) {
+            if (userValidated.email === admin[i]) {
                 access = true;
             } else {
                 i++;
@@ -241,16 +244,20 @@ async function loginCheck(email: string, password: string) {
         return null;
     }
 }
-
 export const getUsersBySeller = async (req: Request, res: Response) => {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { seller } = req.params;
-            const UserAux = await Users.findAll({ where: { seller: seller } });
-            if (UserAux) {
-                res.json(UserAux);
+            let usersAux;
+            if (seller == 'Esteban Bazziano') {
+                usersAux = await Users.scope('withAll').findAll();
+            } else {
+                usersAux = await Users.scope('withAll').findAll({ where: { seller: seller } });
+            }
+            if (usersAux) {
+                res.json(usersAux);
             } else {
                 res.status(404).json({ message: 'Error, User not found' })
             }
@@ -352,8 +359,8 @@ const verifyAdmin = (adminToken: any) => {
         const userAux: PublicUser = dataAdmin as PublicUser;
         let access = false;
         let i = 0;
-        while(i<admin.length && !access){
-            if(userAux.email === admin[i]){
+        while (i < admin.length && !access) {
+            if (userAux.email === admin[i]) {
                 access = true;
             } else {
                 i++;
