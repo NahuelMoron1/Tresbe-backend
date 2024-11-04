@@ -1,9 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getToken = exports.tokenExist = void 0;
+exports.superAdminCheck = exports.getToken = exports.tokenExist = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../models/config");
 const tokenExist = (req, res) => {
@@ -59,44 +68,27 @@ const tokenExist = (req, res) => {
                         sameSite: 'none',
                         maxAge: 1000 * 60 * 60
                     });
-                    const adminToken = req.cookies.admin_token;
-                    if (adminToken) {
-                        const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
-                        if (typeof dataAdmin === 'object' && dataAdmin !== null) {
-                            const userAux = dataAdmin;
-                            let access = false;
-                            let i = 0;
-                            while (i < config_1.admin.length && !access) {
-                                if (user.email === config_1.admin[i]) {
-                                    access = true;
-                                }
-                                else {
-                                    i++;
-                                }
-                            }
-                            let access2 = false;
-                            let m = 0;
-                            while (m < config_1.admin.length && !access2) {
-                                if (userAux.email === config_1.admin[m]) {
-                                    access2 = true;
-                                }
-                                else {
-                                    m++;
-                                }
-                            }
-                            if (access2 && access) {
-                                const admin_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
-                                res.cookie('admin_token', admin_token, {
-                                    path: '/',
-                                    httpOnly: true,
-                                    secure: true,
-                                    domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                                    ///domain: '.tresbedistribuidora.com',
-                                    sameSite: 'none',
-                                    maxAge: 1000 * 60 * 60
-                                });
-                            }
+                    let access = false;
+                    let i = 0;
+                    while (i < config_1.admin.length && !access) {
+                        if (user.email === config_1.admin[i]) {
+                            access = true;
                         }
+                        else {
+                            i++;
+                        }
+                    }
+                    if (access) {
+                        const admin_token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller }, config_1.SECRET_JWT_KEY, { expiresIn: "1h" });
+                        res.cookie('admin_token', admin_token, {
+                            path: '/',
+                            httpOnly: true,
+                            secure: true,
+                            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                            ///domain: '.tresbedistribuidora.com',
+                            sameSite: 'none',
+                            maxAge: 1000 * 60 * 60
+                        });
                     }
                     return res.json(true); // Usamos return para evitar que siga ejecutando código
                 }
@@ -134,3 +126,25 @@ const getToken = (req, res) => {
     }
 };
 exports.getToken = getToken;
+const superAdminCheck = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { admin } = req.params;
+    if (admin) {
+        let i = 0;
+        let access = false;
+        while (i < config_1.superAdmin.length && !access) {
+            if (admin == config_1.superAdmin[i]) {
+                access = true;
+            }
+            else {
+                i++;
+            }
+        }
+        if (access) {
+            res.json(true);
+        }
+        else {
+            res.json(false);
+        }
+    }
+});
+exports.superAdminCheck = superAdminCheck;

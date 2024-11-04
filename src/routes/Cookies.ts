@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getToken, tokenExist } from "../controllers/Cookies";
+import { getToken, superAdminCheck, tokenExist } from "../controllers/Cookies";
 
 const router = Router();
 
 router.get('/check/:cookieName', tokenExist);
 router.get('/get/:cookieName', getToken);
+router.get('/superadmin/:admin', superAdminCheck);
 export default router;

@@ -19,7 +19,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_2 = require("../models/config");
 const getUserXcoupon = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userID, couponID } = req.params;
-    const UserAux = yield UserXcoupon_1.default.findOne({ where: { userID: userID } && { couponID: couponID } });
+    const UserAux = yield UserXcoupon_1.default.findOne({ where: { userID: userID, couponID: couponID } });
     if (UserAux) {
         res.json(UserAux);
     }

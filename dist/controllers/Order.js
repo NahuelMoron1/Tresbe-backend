@@ -126,7 +126,7 @@ const getOrdersNotPayed = (req, res) => __awaiter(void 0, void 0, void 0, functi
     if (access_token && admin_token) {
         if (verifyAdmin(admin_token)) {
             const { userid } = req.params;
-            const ordersAux = yield Orders_1.default.findAll({ where: { userId: userid } && { payed: false } });
+            const ordersAux = yield Orders_1.default.findAll({ where: { userId: userid, payed: false } });
             if (ordersAux) {
                 res.json(ordersAux);
             }

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { admin, SECRET_JWT_KEY } from "../models/config";
+import { admin, SECRET_JWT_KEY, superAdmin } from "../models/config";
 import { PublicUser } from "../models/PublicUser";
 
 export const tokenExist = (req: Request, res: Response) => {
@@ -58,48 +58,31 @@ export const tokenExist = (req: Request, res: Response) => {
                         maxAge: 1000 * 60 * 60
                     });
 
-                    const adminToken = req.cookies.admin_token;
-                    if (adminToken) {
-                        const dataAdmin = jwt.verify(adminToken, SECRET_JWT_KEY);
-                        if (typeof dataAdmin === 'object' && dataAdmin !== null) {
-                            const userAux: PublicUser = dataAdmin as PublicUser;
-                            let access = false;
-                            let i = 0;
-                            while (i < admin.length && !access) {
-                                if (user.email === admin[i]) {
-                                    access = true;
-                                } else {
-                                    i++;
-                                }
-                            }
-                            let access2 = false;
-                            let m = 0;
-                            while (m < admin.length && !access2) {
-                                if (userAux.email === admin[m]) {
-                                    access2 = true;
-                                } else {
-                                    m++;
-                                }
-                            }
-                            if (access2 && access) {
-                                const admin_token = jwt.sign(
-                                    { id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller },
-                                    SECRET_JWT_KEY,
-                                    { expiresIn: "1h" }
-                                );
-                                res.cookie('admin_token', admin_token, {
-                                    path: '/',
-                                    httpOnly: true,
-                                    secure: true,
-                                    domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                                    ///domain: '.tresbedistribuidora.com',
-                                    sameSite: 'none',
-                                    maxAge: 1000 * 60 * 60
-                                });
-                            }
+                    let access = false;
+                    let i = 0;
+                    while (i < admin.length && !access) {
+                        if (user.email === admin[i]) {
+                            access = true;
+                        } else {
+                            i++;
                         }
                     }
-
+                    if(access){
+                        const admin_token = jwt.sign(
+                            { id: user.id, email: user.email, priceList: user.priceList, username: user.username, client: user.client, seller: user.seller },
+                            SECRET_JWT_KEY,
+                            { expiresIn: "1h" }
+                        );
+                        res.cookie('admin_token', admin_token, {
+                            path: '/',
+                            httpOnly: true,
+                            secure: true,
+                            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
+                            ///domain: '.tresbedistribuidora.com',
+                            sameSite: 'none',
+                            maxAge: 1000 * 60 * 60
+                        });
+                    }
                     return res.json(true); // Usamos return para evitar que siga ejecutando código
                 } else {
                     return res.status(401).send("Acceso denegado"); // Enviamos respuesta y detenemos la ejecución
@@ -130,4 +113,24 @@ export const getToken = (req: Request, res: Response) => {
             return res.status(401).send("acceso denegado"); // Enviamos respuesta de error en caso de excepción
         }
     }
-};
+}
+
+export const superAdminCheck = async (req: Request, res: Response) => {
+    const { admin } = req.params;
+    if(admin){
+        let i = 0;
+        let access = false;
+        while(i<superAdmin.length && !access){
+            if(admin == superAdmin[i]){
+                access = true;
+            } else {
+                i++;
+            }
+        }
+        if(access){
+            res.json(true);
+        } else {
+            res.json(false);
+        }
+    }
+}

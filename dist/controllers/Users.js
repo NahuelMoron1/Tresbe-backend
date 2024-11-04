@@ -86,6 +86,8 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         if (access) {
             const UserAux = yield Users_1.default.scope('withAll').findByPk(id);
+            console.log("USER USER USER");
+            console.log(userAux);
             if (UserAux) {
                 res.json(UserAux);
             }
@@ -277,9 +279,15 @@ const getUsersBySeller = (req, res) => __awaiter(void 0, void 0, void 0, functio
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { seller } = req.params;
-            const UserAux = yield Users_1.default.findAll({ where: { seller: seller } });
-            if (UserAux) {
-                res.json(UserAux);
+            let usersAux;
+            if (seller == 'Esteban Bazziano') {
+                usersAux = yield Users_1.default.scope('withAll').findAll();
+            }
+            else {
+                usersAux = yield Users_1.default.scope('withAll').findAll({ where: { seller: seller } });
+            }
+            if (usersAux) {
+                res.json(usersAux);
             }
             else {
                 res.status(404).json({ message: 'Error, User not found' });

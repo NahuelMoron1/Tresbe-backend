@@ -7,7 +7,7 @@ import { PublicUser } from "../models/PublicUser";
 
 export const getUserXcoupon = async (req: Request, res: Response) => {
     const { userID, couponID } = req.params;
-    const UserAux = await UserXcoupon.findOne({ where: { userID: userID } && { couponID: couponID } });
+    const UserAux = await UserXcoupon.findOne({ where: { userID: userID, couponID: couponID } });
     if (UserAux) {
         res.json(UserAux);
     } else {

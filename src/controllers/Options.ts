@@ -44,7 +44,7 @@ export const getProductOptionsByTwo = async (req: Request, res: Response) => {
     const { optionName } = req.params;
     const optionValid = decodeURIComponent(optionName);
 
-    const OptionAux = await Options.findOne({ where: { name: optionValid } && { productID: productID } });
+    const OptionAux = await Options.findOne({ where: { name: optionValid, productID: productID } });
     if (OptionAux) {
         res.json(OptionAux);
     } else {
