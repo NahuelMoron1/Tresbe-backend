@@ -6,9 +6,11 @@ import { PublicUser } from "../models/PublicUser";
 import { admin } from "../models/config";
 import jwt from "jsonwebtoken";
 import { SECRET_JWT_KEY } from "../models/config";
+import { Model, Op, Sequelize } from "sequelize";
 export const getUsers = async (req: Request, res: Response) => {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token
+    const { param } = req.params;
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { email } = req.params;
@@ -22,11 +24,21 @@ export const getUsers = async (req: Request, res: Response) => {
                 }
             }
             if (!access) {
-                const listUsers = await Users.findAll();
-                let users: PublicUser[] = [];
-                if (listUsers) {
-                    users = listUsers.map(user => user.toJSON() as PublicUser);
+                let listUsers;
+                if (param == 'search') {
+                    const { name } = req.params;
+                    const searchTerm: string = `${name}%`
+                    const whereConditions = {
+                        username: {
+                          [Op.like]: searchTerm
+                        }
+                      };
+                    listUsers = await Users.findAll({ where: whereConditions })
+                } else {
+                    listUsers = await Users.findAll();
                 }
+                let users: PublicUser[] = [];
+                users = listUsers.map(user => user.toJSON() as PublicUser);
                 res.json(users);
             } else if (access) {
                 const listUsers = await Users.scope('withAll').findAll();
@@ -185,7 +197,7 @@ export const login = async (req: Request, res: Response) => {
             res.send({ userValidated, access_token });
         }
     } else {
-        res.status(404).json({ message: 'Error al iniciar sesion' });
+        res.status(404).json({ message: 'El email o la contraseña es incorrecto' });
     }
 }
 
