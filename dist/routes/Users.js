@@ -5,6 +5,7 @@ const Users_1 = require("../controllers/Users");
 const Email_1 = require("../controllers/Email");
 const router = (0, express_1.Router)();
 router.get('/', Users_1.getUsers);
+router.get('/search/:param/:name', Users_1.getUsers);
 router.get('/:id', Users_1.getUser);
 router.get('/email/:email/:loggedEmail', Users_1.getUserByEmail);
 router.get('/seller/:seller/:email', Users_1.getUsersBySeller);

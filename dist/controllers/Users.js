@@ -20,9 +20,11 @@ const PublicUser_1 = require("../models/PublicUser");
 const config_1 = require("../models/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_2 = require("../models/config");
+const sequelize_1 = require("sequelize");
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
+    const { param } = req.params;
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { email } = req.params;
@@ -37,11 +39,22 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 }
             }
             if (!access) {
-                const listUsers = yield Users_1.default.findAll();
-                let users = [];
-                if (listUsers) {
-                    users = listUsers.map(user => user.toJSON());
+                let listUsers;
+                if (param == 'search') {
+                    const { name } = req.params;
+                    const searchTerm = `${name}%`;
+                    const whereConditions = {
+                        username: {
+                            [sequelize_1.Op.like]: searchTerm
+                        }
+                    };
+                    listUsers = yield Users_1.default.findAll({ where: whereConditions });
                 }
+                else {
+                    listUsers = yield Users_1.default.findAll();
+                }
+                let users = [];
+                users = listUsers.map(user => user.toJSON());
                 res.json(users);
             }
             else if (access) {
@@ -213,7 +226,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     else {
-        res.status(404).json({ message: 'Error al iniciar sesion' });
+        res.status(404).json({ message: 'El email o la contraseña es incorrecto' });
     }
 });
 exports.login = login;

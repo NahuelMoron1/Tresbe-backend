@@ -4,6 +4,7 @@ import { sendEmail } from "../controllers/Email";
 const router = Router();
 
 router.get('/', getUsers);
+router.get('/search/:param/:name', getUsers);
 router.get('/:id', getUser);
 router.get('/email/:email/:loggedEmail', getUserByEmail);
 router.get('/seller/:seller/:email', getUsersBySeller);
