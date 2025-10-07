@@ -84,7 +84,6 @@ class Server {
         ];
         this.app.use(express_1.default.json());
         this.app.use((0, cookie_parser_1.default)());
-        this.app.use("/webhook", webhook_1.default);
         this.app.use((0, cors_1.default)({
             origin: allowedOrigins,
             methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
