@@ -74,7 +74,6 @@ class Server {
     ];
     this.app.use(express.json());
     this.app.use(cookieParser());
-    this.app.use("/webhook", webhookRouter);
     this.app.use(
       cors({
         origin: allowedOrigins,

@@ -169,10 +169,6 @@ const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.getUserByEmail = getUserByEmail;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
-    console.log("ON LOGIN");
-    console.log("ON LOGIN");
-    console.log("ON LOGIN");
-    console.log("ON LOGIN");
     const userAux = yield loginCheck(email, password);
     let userValidated = new User_1.User("", "", "", "", false, "", "");
     if (userAux != null) {
