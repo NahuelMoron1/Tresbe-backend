@@ -19,7 +19,7 @@ const sendEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let { subject } = req.body;
     let { text } = req.body;
     let transporter = nodemailer_1.default.createTransport({
-        service: 'Gmail', // Puedes usar otro servicio como 'Yahoo', 'Outlook', etc.
+        service: 'Gmail',
         auth: {
             user: 'info.tresbedistribuidora@gmail.com',
             pass: 'tyfd wyjm qnle fgvt'

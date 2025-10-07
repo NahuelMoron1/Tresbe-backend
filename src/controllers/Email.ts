@@ -7,7 +7,7 @@ export const sendEmail = async (req: Request, res: Response) => {
     let { text } = req.body;
 
     let transporter = nodemailer.createTransport({
-        service: 'Gmail', // Puedes usar otro servicio como 'Yahoo', 'Outlook', etc.
+        service: 'Gmail',
         auth: {
             user: 'info.tresbedistribuidora@gmail.com',
             pass: 'tyfd wyjm qnle fgvt'

@@ -13,156 +13,288 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePriceXproducts = exports.updateOptionID = exports.updatePriceXproduct = exports.postPriceXproduct = exports.deletePriceXproduct = exports.deletePriceXproductByOptionID = exports.getTableByProduct = exports.getPriceXproduct = exports.getPriceXproducts = void 0;
-const PriceXproducts_1 = __importDefault(require("../models/mysql/PriceXproducts"));
-const config_1 = require("../models/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_2 = require("../models/config");
+const config_1 = require("../models/config");
+const PriceXproducts_1 = __importDefault(require("../models/mysql/PriceXproducts"));
 const getPriceXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const listProducts = yield PriceXproducts_1.default.findAll();
-            res.json(listProducts);
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        const listProducts = yield PriceXproducts_1.default.findAll();
+        if (!listProducts) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron precios por producto" });
+        }
+        return res.status(200).json(listProducts);
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getPriceXproducts = getPriceXproducts;
 const getPriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const productAux = yield PriceXproducts_1.default.findByPk(id);
-    if (productAux) {
-        res.json(productAux);
+    try {
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield PriceXproducts_1.default.findByPk(id);
+        if (!productAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontró el precio por producto buscado" });
+        }
+        return res.status(200).json(productAux);
     }
-    else {
-        res.status(404).json({ message: 'Error, Product not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getPriceXproduct = getPriceXproduct;
 const getTableByProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { optionID } = req.params;
-    const tableAux = yield PriceXproducts_1.default.findOne({ where: { optionID: optionID } });
-    if (tableAux) {
-        res.json(tableAux);
+    try {
+        const { optionID } = req.params;
+        if (!optionID || typeof optionID !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const tableAux = yield PriceXproducts_1.default.findOne({
+            where: { optionID: optionID },
+        });
+        if (!tableAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontró la tabla buscada por producto" });
+        }
+        return res.status(200).json(tableAux);
     }
-    else {
-        res.status(404).json({ message: 'Error, Userdata not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getTableByProduct = getTableByProduct;
 const deletePriceXproductByOptionID = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const productAux = yield PriceXproducts_1.default.findOne({ where: { optionID: id } });
-    if (productAux) {
-        yield productAux.destroy();
-        return 'DELETED';
+    try {
+        const productAux = yield PriceXproducts_1.default.findOne({
+            where: { optionID: id },
+        });
+        if (productAux) {
+            yield productAux.destroy();
+            return "DELETED";
+        }
+        else {
+            return "Error";
+        }
     }
-    else {
-        return 'Error';
+    catch (error) {
+        return "Error";
     }
 });
 exports.deletePriceXproductByOptionID = deletePriceXproductByOptionID;
 const deletePriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const { id } = req.params;
-            const productAux = yield PriceXproducts_1.default.findByPk(`${id}`);
-            if (productAux) {
-                yield productAux.destroy();
-                res.json({ message: 'Product successfully deleted' });
-            }
-            else {
-                res.status(404).json({ message: 'Error, product not found' });
-            }
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield PriceXproducts_1.default.findByPk(`${id}`);
+        if (!productAux) {
+            return res.status(404).json({
+                message: "No se encontró el precio por producto buscado para eliminar",
+            });
+        }
+        yield productAux.destroy();
+        return res.status(200).json({ message: "Product successfully deleted" });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.deletePriceXproduct = deletePriceXproduct;
 const postPriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const body = req.body;
-            yield PriceXproducts_1.default.create(body);
-            res.json({
-                message: 'Product successfully created',
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
+        }
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
+        }
+        const body = req.body;
+        if (!validatePriceXproducts(body)) {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa los datos que enviaste",
             });
         }
-        else {
-            res.send('Ruta protegida');
-        }
+        yield PriceXproducts_1.default.create(body);
+        return res.status(200).json({
+            message: "Product successfully created",
+        });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.postPriceXproduct = postPriceXproduct;
+function validatePriceXproducts(body) {
+    if (!body.optionID ||
+        typeof body.optionID !== "string" ||
+        !body.priceList1 ||
+        typeof body.priceList1 !== "number" ||
+        !body.priceList2 ||
+        typeof body.priceList2 !== "number" ||
+        !body.priceList3 ||
+        typeof body.priceList3 !== "number" ||
+        !body.priceList4 ||
+        typeof body.priceList4 !== "number" ||
+        !body.priceListE ||
+        typeof body.priceListE !== "number" ||
+        !body.priceListG ||
+        typeof body.priceListG !== "number" ||
+        !body.costPrice ||
+        typeof body.costPrice !== "number") {
+        return false;
+    }
+    return true;
+}
 const updatePriceXproduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    const { id } = req.params;
-    const productAux = yield PriceXproducts_1.default.findByPk(id);
-    if (productAux) {
+    try {
+        const body = req.body;
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield PriceXproducts_1.default.findByPk(id);
+        if (!productAux) {
+            return res.status(404).json({
+                message: "No se encontró el precio por producto buscado para actualizar",
+            });
+        }
         yield productAux.update(body);
-        res.json({
-            message: 'Product updated with success',
+        return res.status(200).json({
+            message: "Producto modificado con exito",
         });
     }
-    else {
-        res.status(404).json({ message: 'Error, product not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.updatePriceXproduct = updatePriceXproduct;
 const updateOptionID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    const { id } = req.params;
-    const productAux = yield PriceXproducts_1.default.findOne({ where: { optionID: id } });
-    if (typeof productAux === 'object' && productAux != null) {
+    try {
+        const body = req.body;
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield PriceXproducts_1.default.findOne({
+            where: { optionID: id },
+        });
+        if (typeof productAux !== "object" || productAux === null) {
+            return res.status(404).json({
+                message: "No se encontró el precio por producto buscado para actualizar",
+            });
+        }
         const pricesAux = productAux;
         pricesAux.optionID = body.optionID;
-        ///await productAux.update(pricesAux);
         yield PriceXproducts_1.default.update({ optionID: pricesAux.optionID }, { where: { id: pricesAux.id } });
-        res.json({
-            message: 'OPTION ID updated with success',
+        return res.status(200).json({
+            message: "OPTION ID updated with success",
         });
     }
-    else {
-        res.status(404).json({ message: 'Error, product not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.updateOptionID = updateOptionID;
 const deletePriceXproducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            yield PriceXproducts_1.default.destroy({ truncate: true });
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        yield PriceXproducts_1.default.destroy({ truncate: true });
+        return res
+            .status(200)
+            .json({ message: "Precios por productos eliminados en su totalidad" });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.deletePriceXproducts = deletePriceXproducts;
 const verifyAdmin = (adminToken) => {
-    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
-    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
+    if (typeof dataAdmin === "object" && dataAdmin !== null) {
         const userAux = dataAdmin;
         let access = false;
         let i = 0;

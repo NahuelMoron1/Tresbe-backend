@@ -13,127 +13,226 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteFeatures = exports.updateFeature = exports.postFeature = exports.deleteFeature = exports.getProductFeatures = exports.getFeature = exports.getFeatures = void 0;
-const Features_1 = __importDefault(require("../models/mysql/Features"));
-const config_1 = require("../models/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_2 = require("../models/config");
+const config_1 = require("../models/config");
+const Features_1 = __importDefault(require("../models/mysql/Features"));
 const getFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const listFeatures = yield Features_1.default.findAll();
-            res.json(listFeatures);
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        const listFeatures = yield Features_1.default.findAll();
+        if (!listFeatures) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron las caracteristicas" });
+        }
+        return res.status(200).json(listFeatures);
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getFeatures = getFeatures;
 const getFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const FeatureAux = yield Features_1.default.findByPk(id);
-    if (FeatureAux) {
-        res.json(FeatureAux);
+    try {
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const FeatureAux = yield Features_1.default.findByPk(id);
+        if (!FeatureAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron las caracteristicas" });
+        }
+        return res.status(200).json(FeatureAux);
     }
-    else {
-        res.status(404).json({ message: 'Error, Feature not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getFeature = getFeature;
 const getProductFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { productID } = req.params;
-    const FeatureAux = yield Features_1.default.findAll({ where: { product_id: productID } });
-    if (FeatureAux) {
-        res.json(FeatureAux);
+    try {
+        const { productID } = req.params;
+        if (!productID || typeof productID !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const FeatureAux = yield Features_1.default.findAll({
+            where: { product_id: productID },
+        });
+        if (!FeatureAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron las caracteristicas" });
+        }
+        return res.status(200).json(FeatureAux);
     }
-    else {
-        res.status(404).json({ message: 'Error, Features not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getProductFeatures = getProductFeatures;
 const deleteFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const { id } = req.params;
-            const FeatureAux = yield Features_1.default.findByPk(`${id}`);
-            if (FeatureAux) {
-                yield FeatureAux.destroy();
-                res.json({ message: 'Feature successfully deleted' });
-            }
-            else {
-                res.status(404).json({ message: 'Error, Feature not found' });
-            }
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const FeatureAux = yield Features_1.default.findByPk(`${id}`);
+        if (!FeatureAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron las caracteristicas" });
+        }
+        yield FeatureAux.destroy();
+        return res.status(200).json({ message: "Feature successfully deleted" });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.deleteFeature = deleteFeature;
 const postFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const body = req.body;
-            yield Features_1.default.create(body);
-            res.json({
-                message: 'Feature successfully created',
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
+        }
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
+        }
+        const body = req.body;
+        if (!validateFeature(body)) {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa los datos que enviaste",
             });
         }
-        else {
-            res.send('Ruta protegida');
-        }
+        yield Features_1.default.create(body);
+        return res.status(200).json({
+            message: "Feature successfully created",
+        });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.postFeature = postFeature;
+function validateFeature(body) {
+    if (!body.product_id ||
+        typeof body.product_id !== "string" ||
+        !body.name ||
+        typeof body.name !== "string") {
+        return false;
+    }
+    return true;
+}
 const updateFeature = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    const { id } = req.params;
-    const FeatureAux = yield Features_1.default.findByPk(id);
-    if (FeatureAux) {
-        FeatureAux.update(body);
-        res.json({
-            message: 'Feature updated',
+    try {
+        const body = req.body;
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const FeatureAux = yield Features_1.default.findByPk(id);
+        if (!FeatureAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron las caracteristicas" });
+        }
+        yield FeatureAux.update(body);
+        return res.status(200).json({
+            message: "Feature updated",
         });
     }
-    else {
-        res.status(404).json({ message: 'Error, Feature not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.updateFeature = updateFeature;
 const deleteFeatures = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            yield Features_1.default.destroy({ truncate: true });
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        yield Features_1.default.destroy({ truncate: true });
+        return res
+            .status(200)
+            .json({ message: "Caracteristicas eliminadas correctamente" });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.deleteFeatures = deleteFeatures;
 const verifyAdmin = (adminToken) => {
-    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
-    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
+    if (typeof dataAdmin === "object" && dataAdmin !== null) {
         const userAux = dataAdmin;
         let access = false;
         let i = 0;
