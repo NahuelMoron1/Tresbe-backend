@@ -13,118 +13,206 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCartProducts = exports.updateCartProduct = exports.postCartProduct = exports.deleteCartProduct = exports.getCartProductsByOrder = exports.getCartProduct = exports.getCartProducts = void 0;
-const CartProduct_1 = __importDefault(require("../models/mysql/CartProduct"));
-const config_1 = require("../models/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_2 = require("../models/config");
+const config_1 = require("../models/config");
+const CartProduct_1 = __importDefault(require("../models/mysql/CartProduct"));
 const getCartProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const listProducts = yield CartProduct_1.default.findAll();
-            res.json(listProducts);
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        const listProducts = yield CartProduct_1.default.findAll();
+        if (!listProducts) {
+            return res
+                .status(404)
+                .json({ message: "No se encontraron productos del carrito" });
+        }
+        return res.status(200).json(listProducts);
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getCartProducts = getCartProducts;
 const getCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const productAux = yield CartProduct_1.default.findByPk(id);
-    if (productAux) {
-        res.json(productAux);
+    try {
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield CartProduct_1.default.findByPk(id);
+        if (!productAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontró el producto de carrito" });
+        }
+        return res.status(200).json(productAux);
     }
-    else {
-        res.status(404).json({ message: 'Error, CartProduct not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getCartProduct = getCartProduct;
 const getCartProductsByOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { orderID } = req.params;
-    const productsAux = yield CartProduct_1.default.findAll({ where: { orderID: orderID } });
-    if (productsAux) {
-        res.json(productsAux);
+    try {
+        const { orderID } = req.params;
+        if (!orderID || typeof orderID !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productsAux = yield CartProduct_1.default.findAll({
+            where: { orderID: orderID },
+        });
+        if (!productsAux) {
+            return res
+                .status(404)
+                .json({ message: "No se encontró el producto de carrito" });
+        }
+        return res.status(200).json(productsAux);
     }
-    else {
-        res.status(404).json({ message: 'Error, CartProduct not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.getCartProductsByOrder = getCartProductsByOrder;
 const deleteCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            const { id } = req.params;
-            const productAux = yield CartProduct_1.default.findByPk(`${id}`);
-            if (productAux) {
-                yield productAux.destroy();
-                res.json({ message: 'CartProduct successfully deleted' });
-            }
-            else {
-                res.status(404).json({ message: 'Error, Cartproduct not found' });
-            }
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield CartProduct_1.default.findByPk(`${id}`);
+        if (!productAux) {
+            return res.status(404).json({
+                message: "No se encontró el producto de carrito buscado para eliminar",
+            });
+        }
+        yield productAux.destroy();
+        res.status(200).json({ message: "Producto de carrito borrado con exito" });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.deleteCartProduct = deleteCartProduct;
 const postCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    if (access_token) {
+    try {
+        const access_token = req.cookies.access_token;
+        if (!access_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
+        }
         const body = req.body;
         yield CartProduct_1.default.create(body);
-        res.json({
-            message: 'CartProduct successfully created',
+        return res.status(200).json({
+            message: "Producto de carrito guardado correctamente",
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
         });
     }
 });
 exports.postCartProduct = postCartProduct;
 const updateCartProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    const { id } = req.params;
-    const productAux = yield CartProduct_1.default.findByPk(id);
-    if (productAux) {
-        productAux.update(body);
-        res.json({
-            message: 'CartProduct updated with success',
+    try {
+        const body = req.body;
+        const { id } = req.params;
+        if (!id || typeof id !== "string") {
+            return res.status(400).json({
+                message: "Formato de datos mal enviado, revisa bien lo que enviaste",
+            });
+        }
+        const productAux = yield CartProduct_1.default.findByPk(id);
+        if (!productAux) {
+            return res.status(404).json({
+                message: "No se encontró el producto de carrito buscado para actualizar",
+            });
+        }
+        yield productAux.update(body);
+        return res.status(200).json({
+            message: "Producto de carrito actualizado con exito",
         });
     }
-    else {
-        res.status(404).json({ message: 'Error, Cartproduct not found' });
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.updateCartProduct = updateCartProduct;
 const deleteCartProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const access_token = req.cookies.access_token;
-    const admin_token = req.cookies.admin_token;
-    if (access_token && admin_token) {
-        if (verifyAdmin(admin_token)) {
-            yield CartProduct_1.default.destroy({ truncate: true });
+    try {
+        const access_token = req.cookies.access_token;
+        const admin_token = req.cookies.admin_token;
+        if (!access_token || !admin_token) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
-        else {
-            res.send('Ruta protegida');
+        if (!verifyAdmin(admin_token)) {
+            return res
+                .status(401)
+                .json({ message: "No tenes permiso para realizar esta acción" });
         }
+        yield CartProduct_1.default.destroy({ truncate: true });
+        return res
+            .status(200)
+            .json({ message: "Productos de carrito eliminados con exito" });
     }
-    else {
-        res.send('Ruta protegida');
+    catch (error) {
+        return res.status(500).json({
+            message: "Hubo un error, ponete en contacto con sistemas: ",
+            error,
+        });
     }
 });
 exports.deleteCartProducts = deleteCartProducts;
 const verifyAdmin = (adminToken) => {
-    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
-    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
+    if (typeof dataAdmin === "object" && dataAdmin !== null) {
         const userAux = dataAdmin;
         let access = false;
         let i = 0;

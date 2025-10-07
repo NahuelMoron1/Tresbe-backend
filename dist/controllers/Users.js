@@ -13,14 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUsers = exports.updatePassword = exports.updateUser = exports.postUser = exports.deleteUser = exports.getUserByName = exports.getUsersBySeller = exports.logout = exports.login = exports.getUserByEmail = exports.getUser = exports.getUsers = void 0;
-const Users_1 = __importDefault(require("../models/mysql/Users"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const User_1 = require("../models/User");
-const PublicUser_1 = require("../models/PublicUser");
-const config_1 = require("../models/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_2 = require("../models/config");
 const sequelize_1 = require("sequelize");
+const PublicUser_1 = require("../models/PublicUser");
+const User_1 = require("../models/User");
+const config_1 = require("../models/config");
+const Users_1 = __importDefault(require("../models/mysql/Users"));
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.admin_token;
     let access = req.cookies.access_token;
@@ -40,13 +39,13 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
             if (!access) {
                 let listUsers;
-                if (param == 'search') {
+                if (param == "search") {
                     const { name } = req.params;
                     const searchTerm = `${name}%`;
                     const whereConditions = {
                         username: {
-                            [sequelize_1.Op.like]: searchTerm
-                        }
+                            [sequelize_1.Op.like]: searchTerm,
+                        },
                     };
                     listUsers = yield Users_1.default.findAll({ where: whereConditions });
                 }
@@ -54,14 +53,14 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                     listUsers = yield Users_1.default.findAll();
                 }
                 let users = [];
-                users = listUsers.map(user => user.toJSON());
+                users = listUsers.map((user) => user.toJSON());
                 res.json(users);
             }
             else if (access) {
-                const listUsers = yield Users_1.default.scope('withAll').findAll();
+                const listUsers = yield Users_1.default.scope("withAll").findAll();
                 let users = [];
                 if (listUsers) {
-                    users = listUsers.map(user => user.toJSON());
+                    users = listUsers.map((user) => user.toJSON());
                 }
                 res.json(users);
             }
@@ -70,17 +69,17 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         else {
-            res.send('Ruta protegid');
+            res.send("Ruta protegid");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.getUsers = getUsers;
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let tokenAux = req.cookies.access_token;
-    let user = new PublicUser_1.PublicUser('', '', '', '', '', '');
+    let user = new PublicUser_1.PublicUser("", "", "", "", "", "");
     if (tokenAux) {
         let userAux = yield getToken(tokenAux);
         if (userAux) {
@@ -98,39 +97,39 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         if (access) {
-            const UserAux = yield Users_1.default.scope('withAll').findByPk(id);
+            const UserAux = yield Users_1.default.scope("withAll").findByPk(id);
             console.log("USER USER USER");
             console.log(userAux);
             if (UserAux) {
                 res.json(UserAux);
             }
             else {
-                res.status(404).json({ message: 'Error, User not found' });
+                res.status(404).json({ message: "Error, User not found" });
             }
         }
         else {
             if (user.id === id) {
-                const UserAux = yield Users_1.default.scope('withAll').findByPk(id);
+                const UserAux = yield Users_1.default.scope("withAll").findByPk(id);
                 if (UserAux) {
                     res.json(UserAux);
                 }
                 else {
-                    res.status(404).json({ message: 'Error, User not found' });
+                    res.status(404).json({ message: "Error, User not found" });
                 }
             }
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.getUser = getUser;
 function getToken(tokenAux) {
     return __awaiter(this, void 0, void 0, function* () {
-        let user = new PublicUser_1.PublicUser('', '', '', '', '', '');
+        let user = new PublicUser_1.PublicUser("", "", "", "", "", "");
         try {
-            const data = jsonwebtoken_1.default.verify(tokenAux, config_2.SECRET_JWT_KEY);
-            if (typeof data === 'object' && data !== null) {
+            const data = jsonwebtoken_1.default.verify(tokenAux, config_1.SECRET_JWT_KEY);
+            if (typeof data === "object" && data !== null) {
                 user = data; // Casting si estás seguro que data contiene propiedades de User
                 return user;
             }
@@ -149,52 +148,66 @@ const getUserByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function*
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { email } = req.params;
-            const UserAux = yield Users_1.default.scope('withAll').findOne({ where: { email: email } });
+            const UserAux = yield Users_1.default.scope("withAll").findOne({
+                where: { email: email },
+            });
             if (UserAux) {
                 res.json(UserAux);
             }
             else {
-                res.status(404).json({ message: 'Error, User not found' });
+                res.status(404).json({ message: "Error, User not found" });
             }
         }
         else {
-            res.send('Ruta protegida');
+            res.send("Ruta protegida");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.getUserByEmail = getUserByEmail;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     const userAux = yield loginCheck(email, password);
-    let userValidated = new User_1.User('', '', '', '', false, '', '');
+    let userValidated = new User_1.User("", "", "", "", false, "", "");
     if (userAux != null) {
         userValidated = userAux;
-        const access_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client, seller: userValidated.seller }, config_2.SECRET_JWT_KEY, {
-            expiresIn: "1h"
+        const access_token = jsonwebtoken_1.default.sign({
+            id: userValidated.id,
+            email: userValidated.email,
+            priceList: userValidated.priceList,
+            username: userValidated.username,
+            client: userValidated.client,
+            seller: userValidated.seller,
+        }, config_1.SECRET_JWT_KEY, {
+            expiresIn: "1h",
         });
-        const refresh_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, priceList: userValidated.priceList, username: userValidated.username, client: userValidated.client, seller: userValidated.seller }, config_2.SECRET_JWT_KEY, {
-            expiresIn: "1d"
+        const refresh_token = jsonwebtoken_1.default.sign({
+            id: userValidated.id,
+            email: userValidated.email,
+            priceList: userValidated.priceList,
+            username: userValidated.username,
+            client: userValidated.client,
+            seller: userValidated.seller,
+        }, config_1.SECRET_JWT_KEY, {
+            expiresIn: "1d",
         });
-        res.cookie('access_token', access_token, {
-            path: '/',
+        res.cookie("access_token", access_token, {
+            path: "/",
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
-            sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            maxAge: 1000 * 60 * 60
+            sameSite: "none",
+            domain: config_1.DOMAIN,
+            maxAge: 1000 * 60 * 60,
         });
-        res.cookie('refresh_token', refresh_token, {
-            path: '/',
+        res.cookie("refresh_token", refresh_token, {
+            path: "/",
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
-            sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            maxAge: 1000 * 60 * 60 * 24
+            sameSite: "none",
+            domain: config_1.DOMAIN,
+            maxAge: 1000 * 60 * 60 * 24,
         });
         let access = false;
         let i = 0;
@@ -207,17 +220,23 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         if (access) {
-            const admin_token = jsonwebtoken_1.default.sign({ id: userValidated.id, email: userValidated.email, username: userValidated.username, priceList: userValidated.priceList, client: userValidated.client, seller: userValidated.seller }, config_2.SECRET_JWT_KEY, {
-                expiresIn: "1h"
+            const admin_token = jsonwebtoken_1.default.sign({
+                id: userValidated.id,
+                email: userValidated.email,
+                username: userValidated.username,
+                priceList: userValidated.priceList,
+                client: userValidated.client,
+                seller: userValidated.seller,
+            }, config_1.SECRET_JWT_KEY, {
+                expiresIn: "1h",
             });
-            res.cookie('admin_token', admin_token, {
-                path: '/',
+            res.cookie("admin_token", admin_token, {
+                path: "/",
                 httpOnly: true,
                 secure: true, ///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
-                sameSite: 'none',
-                domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                maxAge: 1000 * 60 * 60
+                sameSite: "none",
+                domain: config_1.DOMAIN,
+                maxAge: 1000 * 60 * 60,
             });
             res.send({ userValidated, access_token, admin_token });
         }
@@ -226,7 +245,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     else {
-        res.status(404).json({ message: 'El email o la contraseña es incorrecto' });
+        res.status(404).json({ message: "El email o la contraseña es incorrecto" });
     }
 });
 exports.login = login;
@@ -234,43 +253,42 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.cookies.access_token;
     if (token) {
         const admin = req.cookies.admin_token;
-        res.cookie('refresh_token', '', {
-            path: '/',
+        res.cookie("refresh_token", "", {
+            path: "/",
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
-            sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            maxAge: 0
+            sameSite: "none",
+            domain: config_1.DOMAIN,
+            maxAge: 0,
         });
-        res.cookie('access_token', '', {
-            path: '/',
+        res.cookie("access_token", "", {
+            path: "/",
             httpOnly: true,
             secure: true, ///process.env.NODE_ENV == 'production',
-            sameSite: 'none',
-            domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-            maxAge: 0
+            sameSite: "none",
+            domain: config_1.DOMAIN,
+            maxAge: 0,
         });
         if (admin) {
-            res.cookie('admin_token', '', {
-                path: '/',
+            res.cookie("admin_token", "", {
+                path: "/",
                 httpOnly: true,
                 secure: true, ///process.env.NODE_ENV == 'production', FALSE EN HTTP, TRUE EN HTTPS
-                domain: '.somostresbe.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                ///domain: '.tresbedistribuidora.com', // Comparte la cookie entre www.somostresbe.com y api.somostresbe.com
-                sameSite: 'none',
-                maxAge: 0
+                domain: config_1.DOMAIN,
+                sameSite: "none",
+                maxAge: 0,
             });
         }
-        res.send('finish');
+        res.send("finish");
     }
 });
 exports.logout = logout;
 function loginCheck(email, password) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = yield Users_1.default.scope('withAll').findOne({ where: { email: email } });
-        let userAux = new User_1.User('', '', '', '', false, '', '');
+        const user = yield Users_1.default.scope("withAll").findOne({
+            where: { email: email },
+        });
+        let userAux = new User_1.User("", "", "", "", false, "", "");
         if (user != null) {
             userAux = user.toJSON();
             let access = yield bcrypt_1.default.compare(password, userAux.password);
@@ -293,31 +311,33 @@ const getUsersBySeller = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (verifyAdmin(tokenAux)) {
             const { seller } = req.params;
             let usersAux;
-            if (seller == 'Esteban Bazziano') {
-                usersAux = yield Users_1.default.scope('withAll').findAll();
+            if (seller == "Esteban Bazziano") {
+                usersAux = yield Users_1.default.scope("withAll").findAll();
             }
             else {
-                usersAux = yield Users_1.default.scope('withAll').findAll({ where: { seller: seller } });
+                usersAux = yield Users_1.default.scope("withAll").findAll({
+                    where: { seller: seller },
+                });
             }
             if (usersAux) {
                 res.json(usersAux);
             }
             else {
-                res.status(404).json({ message: 'Error, User not found' });
+                res.status(404).json({ message: "Error, User not found" });
             }
         }
         else {
-            res.send('Ruta protegida');
+            res.send("Ruta protegida");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.getUsersBySeller = getUsersBySeller;
 const getUserByName = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let access = req.cookies['access_token'];
-    let tokenAux = req.cookies['admin_token'];
+    let access = req.cookies["access_token"];
+    let tokenAux = req.cookies["admin_token"];
     if (access && tokenAux) {
         if (verifyAdmin(tokenAux)) {
             const { username } = req.params;
@@ -326,15 +346,15 @@ const getUserByName = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 res.json(UserAux);
             }
             else {
-                res.status(404).json({ message: 'Error, User not found' });
+                res.status(404).json({ message: "Error, User not found" });
             }
         }
         else {
-            res.send('Ruta protegida');
+            res.send("Ruta protegida");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.getUserByName = getUserByName;
@@ -347,18 +367,18 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const UserAux = yield Users_1.default.findByPk(`${id}`);
             if (UserAux) {
                 yield UserAux.destroy();
-                res.json({ message: 'User successfully deleted' });
+                res.json({ message: "User successfully deleted" });
             }
             else {
-                res.status(404).json({ message: 'Error, User not found' });
+                res.status(404).json({ message: "Error, User not found" });
             }
         }
         else {
-            res.send('Ruta protegida');
+            res.send("Ruta protegida");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.deleteUser = deleteUser;
@@ -376,7 +396,7 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 priceList,
                 client,
                 seller,
-                password: hashedPassword // Guardar la contraseña hasheada
+                password: hashedPassword, // Guardar la contraseña hasheada
             };
             yield Users_1.default.create(user);
             res.json({
@@ -384,34 +404,34 @@ const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
         else {
-            res.send('Ruta protegida');
+            res.send("Ruta protegida");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.postUser = postUser;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     /*let tokenAux = req.cookies.admin_token;
-    let access = req.cookies.access_token;*/
+      let access = req.cookies.access_token;*/
     const body = req.body;
     const { id } = req.params;
     const UserAux = yield Users_1.default.findByPk(id);
     if (UserAux) {
         UserAux.update(body);
         res.json({
-            message: 'User updated',
+            message: "User updated",
         });
     }
     else {
-        res.status(404).json({ message: 'Error, User not found' });
+        res.status(404).json({ message: "Error, User not found" });
     }
 });
 exports.updateUser = updateUser;
 const verifyAdmin = (adminToken) => {
-    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_2.SECRET_JWT_KEY);
-    if (typeof dataAdmin === 'object' && dataAdmin !== null) {
+    const dataAdmin = jsonwebtoken_1.default.verify(adminToken, config_1.SECRET_JWT_KEY);
+    if (typeof dataAdmin === "object" && dataAdmin !== null) {
         const userAux = dataAdmin;
         let access = false;
         let i = 0;
@@ -445,15 +465,15 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             body.password = yield bcrypt_1.default.hash(body.password, 10);
             UserAux.update(body);
             res.json({
-                message: 'User updated',
+                message: "User updated",
             });
         }
         else {
-            res.status(404).json({ message: 'Error, User not found' });
+            res.status(404).json({ message: "Error, User not found" });
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.updatePassword = updatePassword;
@@ -465,11 +485,11 @@ const deleteUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             yield Users_1.default.destroy({ truncate: true });
         }
         else {
-            res.send('Ruta protegida');
+            res.send("Ruta protegida");
         }
     }
     else {
-        res.send('Ruta protegida');
+        res.send("Ruta protegida");
     }
 });
 exports.deleteUsers = deleteUsers;
