@@ -172,7 +172,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("ON LOGIN");
     console.log("ON LOGIN");
     console.log("ON LOGIN");
-    console.log("ON LOGIN");
+    //console.log("ON LOGIN");
     const userAux = yield loginCheck(email, password);
     let userValidated = new User_1.User("", "", "", "", false, "", "");
     if (userAux != null) {
