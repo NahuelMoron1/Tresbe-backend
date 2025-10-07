@@ -8,7 +8,7 @@ router.post("/github-webhook", (req, res) => {
   console.log("Webhook recibido de GitHub");
 
   exec(
-    "cd /home/tresbedistribuidora/htdocs/api.tresbedistribuidora.com/Tresbe-backend && git pull origin main && npm install --production && pm2 restart mi-backend",
+    "cd /home/tresbedistribuidora/htdocs/api.tresbedistribuidora.com/Tresbe-backend && git pull origin main && pm2 restart mi-backend",
     (err, stdout, stderr) => {
       if (err) {
         console.error(err);
