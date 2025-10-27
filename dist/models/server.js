@@ -28,6 +28,7 @@ const Order_1 = __importDefault(require("../routes/Order"));
 const OrderXproducts_1 = __importDefault(require("../routes/OrderXproducts"));
 const PriceXproducts_1 = __importDefault(require("../routes/PriceXproducts"));
 const Products_1 = __importDefault(require("../routes/Products"));
+const Slack_1 = __importDefault(require("../routes/Slack"));
 const Userdata_1 = __importDefault(require("../routes/Userdata"));
 const Users_1 = __importDefault(require("../routes/Users"));
 const UserXcoupons_1 = __importDefault(require("../routes/UserXcoupons"));
@@ -69,6 +70,7 @@ class Server {
         this.app.use("/api/userXcoupon", UserXcoupons_1.default);
         this.app.use("/api/cookies", Cookies_1.default);
         this.app.use("/webhook", webhook_1.default);
+        this.app.use("/api/slack", Slack_1.default);
         this.app.get("/api/status", (req, res) => {
             res.json(config_1.MAINTENANCE);
         });

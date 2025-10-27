@@ -8,6 +8,7 @@ import { PublicUser } from "../models/PublicUser";
 export const getBrands = async (req: Request, res: Response) => {
   try {
     const listBrands = await Brands.findAll({
+      where: { active: true },
       order: [
         // Primero ponemos las marcas cuyo nombre es 'Tel'
         [sequelize.literal(`CASE WHEN name = 'Tel' THEN 0 ELSE 1 END`), "ASC"],
@@ -39,7 +40,7 @@ export const getBrand = async (req: Request, res: Response) => {
 
     const BrandAux = await Brands.findByPk(id);
 
-    if (!BrandAux) {
+    if (!BrandAux || BrandAux.getDataValue("active") !== true) {
       return res
         .status(404)
         .json({ message: "No se encontró la marca buscada" });
@@ -154,7 +155,7 @@ export const updateBrand = async (req: Request, res: Response) => {
 
     const BrandsAux = await Brands.findByPk(id);
 
-    if (!BrandsAux) {
+    if (!BrandsAux || BrandsAux.getDataValue("active") !== true) {
       return res
         .status(404)
         .json({ message: "No se encontró la marca buscada para eliminar" });

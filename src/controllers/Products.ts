@@ -17,6 +17,7 @@ export const getProducts = async (req: Request, res: Response) => {
     const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
     const offset = (validPageNumb - 1) * pageSize;
     const listProducts = await Products.findAll({
+      where: { active: true },
       limit: pageSize,
       offset: offset,
       order: [
@@ -83,7 +84,7 @@ export const getProduct = async (req: Request, res: Response) => {
 
     const productAux = await Products.findByPk(id);
 
-    if (!productAux) {
+    if (!productAux || productAux.getDataValue("active") !== true) {
       return res.status(404).json({ message: "No se encontró el producto" });
     }
     return res.status(200).json(productAux);
@@ -114,7 +115,7 @@ export const getProductsByBrands = async (req: Request, res: Response) => {
     const offset = (validPageNumb - 1) * pageSize;
 
     const productsAux = await Products.findAll({
-      where: { brand: brand },
+      where: { brand: brand, active: true },
       limit: pageSize,
       offset: offset,
       order: [
@@ -177,7 +178,7 @@ export const getProductsByCategory = async (req: Request, res: Response) => {
     const offset = (validPageNumb - 1) * pageSize;
 
     const productsAux = await Products.findAll({
-      where: { category: category },
+      where: { category: category, active: true },
       limit: pageSize,
       offset: offset,
       order: [
@@ -206,6 +207,7 @@ export const getProductsBySearch = async (req: Request, res: Response) => {
     const whereConditions: any = {
       [Op.and]: searchWords.map((word) => ({
         name: { [Op.like]: `%${word}%` },
+        active: true,
       })),
     };
 
@@ -334,7 +336,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
     const productAux = await Products.findByPk(id);
 
-    if (!productAux) {
+    if (!productAux || productAux.getDataValue("active") !== true) {
       return res
         .status(404)
         .json({ message: "No se encontró el producto a actualizar" });

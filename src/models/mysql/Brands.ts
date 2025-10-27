@@ -1,17 +1,24 @@
-import db from '../../db/connection';
-import { DataTypes } from 'sequelize';
+import { DataTypes } from "sequelize";
+import db from "../../db/connection";
 
-const Brands = db.define('Brands', {
+const Brands = db.define(
+  "Brands",
+  {
     id: {
-        type: DataTypes.STRING,
-        primaryKey: true,
+      type: DataTypes.STRING,
+      primaryKey: true,
     },
     name: {
-        type: DataTypes.STRING,
+      type: DataTypes.STRING,
     },
     image: {
-        type: DataTypes.STRING,
-    }
-}, {timestamps: false})
+      type: DataTypes.STRING,
+    },
+    active: {
+      type: DataTypes.BOOLEAN,
+    },
+  },
+  { timestamps: false }
+);
 
 export default Brands;

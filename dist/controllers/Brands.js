@@ -20,6 +20,7 @@ const Brands_1 = __importDefault(require("../models/mysql/Brands"));
 const getBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const listBrands = yield Brands_1.default.findAll({
+            where: { active: true },
             order: [
                 // Primero ponemos las marcas cuyo nombre es 'Tel'
                 [connection_1.default.literal(`CASE WHEN name = 'Tel' THEN 0 ELSE 1 END`), "ASC"],
@@ -49,7 +50,7 @@ const getBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
         const BrandAux = yield Brands_1.default.findByPk(id);
-        if (!BrandAux) {
+        if (!BrandAux || BrandAux.getDataValue("active") !== true) {
             return res
                 .status(404)
                 .json({ message: "No se encontró la marca buscada" });
@@ -153,7 +154,7 @@ const updateBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             });
         }
         const BrandsAux = yield Brands_1.default.findByPk(id);
-        if (!BrandsAux) {
+        if (!BrandsAux || BrandsAux.getDataValue("active") !== true) {
             return res
                 .status(404)
                 .json({ message: "No se encontró la marca buscada para eliminar" });

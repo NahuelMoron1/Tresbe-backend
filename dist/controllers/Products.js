@@ -29,6 +29,7 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
         const offset = (validPageNumb - 1) * pageSize;
         const listProducts = yield Products_1.default.findAll({
+            where: { active: true },
             limit: pageSize,
             offset: offset,
             order: [
@@ -93,7 +94,7 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             });
         }
         const productAux = yield Products_1.default.findByPk(id);
-        if (!productAux) {
+        if (!productAux || productAux.getDataValue("active") !== true) {
             return res.status(404).json({ message: "No se encontró el producto" });
         }
         return res.status(200).json(productAux);
@@ -123,7 +124,7 @@ const getProductsByBrands = (req, res) => __awaiter(void 0, void 0, void 0, func
         const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
         const offset = (validPageNumb - 1) * pageSize;
         const productsAux = yield Products_1.default.findAll({
-            where: { brand: brand },
+            where: { brand: brand, active: true },
             limit: pageSize,
             offset: offset,
             order: [
@@ -180,7 +181,7 @@ const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const validPageNumb = pageNumb > totalPages ? totalPages : pageNumb;
         const offset = (validPageNumb - 1) * pageSize;
         const productsAux = yield Products_1.default.findAll({
-            where: { category: category },
+            where: { category: category, active: true },
             limit: pageSize,
             offset: offset,
             order: [
@@ -210,6 +211,7 @@ const getProductsBySearch = (req, res) => __awaiter(void 0, void 0, void 0, func
         const whereConditions = {
             [sequelize_1.Op.and]: searchWords.map((word) => ({
                 name: { [sequelize_1.Op.like]: `%${word}%` },
+                active: true,
             })),
         };
         // Agregar la condición de brand si no es 'all'
@@ -325,7 +327,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             });
         }
         const productAux = yield Products_1.default.findByPk(id);
-        if (!productAux) {
+        if (!productAux || productAux.getDataValue("active") !== true) {
             return res
                 .status(404)
                 .json({ message: "No se encontró el producto a actualizar" });

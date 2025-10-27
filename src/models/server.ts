@@ -14,6 +14,7 @@ import ordersRouter from "../routes/Order";
 import ordersXproductsRouter from "../routes/OrderXproducts";
 import tablePriceRouter from "../routes/PriceXproducts";
 import productRouter from "../routes/Products";
+import slackRouter from "../routes/Slack";
 import userdataRouter from "../routes/Userdata";
 import usersRouter from "../routes/Users";
 import userXcouponRouter from "../routes/UserXcoupons";
@@ -59,6 +60,7 @@ class Server {
     this.app.use("/api/userXcoupon", userXcouponRouter);
     this.app.use("/api/cookies", cookieRouter);
     this.app.use("/webhook", webhookRouter);
+    this.app.use("/api/slack", slackRouter);
     this.app.get("/api/status", (req, res) => {
       res.json(MAINTENANCE);
     });
